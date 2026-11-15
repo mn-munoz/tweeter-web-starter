@@ -1,7 +1,22 @@
 import { AuthToken, Status, FakeData } from "tweeter-shared";
 import { Service } from "./Service";
+import { ServerFacade } from "../network/ServerFacade";
 
 export class StatusService implements Service {
+  private _serverFacade: ServerFacade | null = null;
+
+  // Factory method so tests can override it to supply a mock ServerFacade.
+  protected createServerFacade(): ServerFacade {
+    return new ServerFacade();
+  }
+
+  protected get serverFacade(): ServerFacade {
+    if (this._serverFacade === null) {
+      this._serverFacade = this.createServerFacade();
+    }
+    return this._serverFacade;
+  }
+
   public async loadMoreFeedItems(
     authToken: AuthToken,
     userAlias: string,
@@ -9,7 +24,12 @@ export class StatusService implements Service {
     lastItem: Status | null,
   ): Promise<[Status[], boolean]> {
     // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    return this.serverFacade.getMoreFeedItems({
+      token: authToken.token,
+      userAlias: userAlias,
+      pageSize: pageSize,
+      lastItem: lastItem ? lastItem.dto : null,
+    });
   }
 
   public async loadMoreStoryItems(
