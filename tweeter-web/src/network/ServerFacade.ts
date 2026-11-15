@@ -1,9 +1,9 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import {
+  PagedItemRequest,
+  PagedItemResponse,
   PagedStatusItemRequest,
-  PagedStatusItemResponse,
   PagedUserItemRequest,
-  PagedUserItemResponse,
   Status,
   User,
 } from "tweeter-shared";
@@ -18,102 +18,49 @@ export class ServerFacade {
   public async getMoreFollowees(
     request: PagedUserItemRequest,
   ): Promise<[User[], boolean]> {
-    const response = await this.clientCommunicator.doPost<
-      PagedUserItemRequest,
-      PagedUserItemResponse
-    >(request, "/follow/followees/list");
-
-    // Convert the UserDto array returned by ClientCommunicator to a User array
-    const items: User[] | null =
-      response.success && response.items
-        ? response.items.map((dto) => User.fromDto(dto) as User)
-        : null;
-
-    // Handle errors
-    if (response.success) {
-      if (items == null) {
-        throw new Error(`No followees found`);
-      } else {
-        return [items, response.hasMore];
-      }
-    } else {
-      console.error(response);
-      throw new Error(response.message ?? undefined);
-    }
+    return this.getMoreItems(request, "/follow/followees/list", User.fromDto, "followees");
   }
 
   public async getMoreFollowers(
     request: PagedUserItemRequest,
   ): Promise<[User[], boolean]> {
-    const response = await this.clientCommunicator.doPost<
-      PagedUserItemRequest,
-      PagedUserItemResponse
-    >(request, "/follow/followers/list");
-
-    // Convert the UserDto array returned by ClientCommunicator to a User array
-    const items: User[] | null =
-      response.success && response.items
-        ? response.items.map((dto) => User.fromDto(dto) as User)
-        : null;
-
-    // Handle errors
-    if (response.success) {
-      if (items == null) {
-        throw new Error(`No followees found`);
-      } else {
-        return [items, response.hasMore];
-      }
-    } else {
-      console.error(response);
-      throw new Error(response.message ?? undefined);
-    }
+    return this.getMoreItems(request, "/follow/followers/list", User.fromDto, "followers");
   }
 
   public async getMoreFeedItems(
     request: PagedStatusItemRequest,
   ): Promise<[Status[], boolean]> {
-    const response = await this.clientCommunicator.doPost<
-      PagedStatusItemRequest,
-      PagedStatusItemResponse
-    >(request, "/status/feed/list");
-
-    // Convert the UserDto array returned by ClientCommunicator to a User array
-    const items: Status[] | null =
-      response.success && response.items
-        ? response.items.map((dto) => Status.fromDto(dto) as Status)
-        : null;
-
-    // Handle errors
-    if (response.success) {
-      if (items == null) {
-        throw new Error(`No feed posts found`);
-      } else {
-        return [items, response.hasMore];
-      }
-    } else {
-      console.error(response);
-      throw new Error(response.message ?? undefined);
-    }
+    return this.getMoreItems(request, "/status/feed/list", Status.fromDto, "feed posts");
   }
 
   public async getMoreStoryItems(
     request: PagedStatusItemRequest,
   ): Promise<[Status[], boolean]> {
-    const response = await this.clientCommunicator.doPost<
-      PagedStatusItemRequest,
-      PagedStatusItemResponse
-    >(request, "/status/story/list");
+    return this.getMoreItems(request, "/status/story/list", Status.fromDto, "story posts");
+  }
 
-    // Convert the UserDto array returned by ClientCommunicator to a User array
-    const items: Status[] | null =
+  // Posts a paged request, converts the returned DTOs to domain objects, and handles errors.
+  private async getMoreItems<DTO, T>(
+    request: PagedItemRequest<DTO>,
+    endpoint: string,
+    fromDto: (dto: DTO) => T | null,
+    itemDescription: string,
+  ): Promise<[T[], boolean]> {
+    const response = await this.clientCommunicator.doPost<
+      PagedItemRequest<DTO>,
+      PagedItemResponse<DTO>
+    >(request, endpoint);
+
+    // Convert the DTO array returned by ClientCommunicator to a domain object array
+    const items: T[] | null =
       response.success && response.items
-        ? response.items.map((dto) => Status.fromDto(dto) as Status)
+        ? response.items.map((dto) => fromDto(dto) as T)
         : null;
 
     // Handle errors
     if (response.success) {
       if (items == null) {
-        throw new Error(`No story posts found`);
+        throw new Error(`No ${itemDescription} found`);
       } else {
         return [items, response.hasMore];
       }

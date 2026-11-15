@@ -27,3 +27,8 @@
 - Tool: Claude Code
 - Task: Make the paged lambdas consistent by using named parameters instead of (...args), and change StatusService to take StatusDto so the lambdas no longer convert lastItem themselves.
 - Review: DONE
+
+## 2026-11-15: tweeter-web/src/network/ServerFacade.ts
+- Tool: Claude Code
+- Task: Remove the duplicated request/convert/error-handling code in ServerFacade.ts in tweeter-web.
+- Review: DONE
