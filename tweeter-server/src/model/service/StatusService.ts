@@ -18,7 +18,7 @@ export class StatusService implements Service {
   }
 
   public async loadMoreStoryItems(
-    authToken: AuthToken,
+    authToken: string,
     userAlias: string,
     pageSize: number,
     lastItem: Status | null,

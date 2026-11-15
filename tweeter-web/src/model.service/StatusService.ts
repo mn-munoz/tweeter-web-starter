@@ -23,7 +23,6 @@ export class StatusService implements Service {
     pageSize: number,
     lastItem: Status | null,
   ): Promise<[Status[], boolean]> {
-    // TODO: Replace with the result of calling server
     return this.serverFacade.getMoreFeedItems({
       token: authToken.token,
       userAlias: userAlias,
@@ -39,7 +38,12 @@ export class StatusService implements Service {
     lastItem: Status | null,
   ): Promise<[Status[], boolean]> {
     // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfStatuses(lastItem, pageSize);
+    return this.serverFacade.getMoreStoryItems({
+      token: authToken.token,
+      userAlias: userAlias,
+      pageSize: pageSize,
+      lastItem: lastItem ? lastItem.dto : null,
+    });
   }
 
   public async postStatus(
