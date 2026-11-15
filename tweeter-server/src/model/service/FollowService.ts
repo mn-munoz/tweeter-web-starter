@@ -23,7 +23,7 @@ export class FollowService implements Service {
     authToken: string,
     userAlias: string,
     pageSize: number,
-    lastItem: User | null,
+    lastItem: UserDto | null,
   ): Promise<[UserDto[], boolean]>{
     // TODO: Replace with the result of calling server
     return this.getFakeData(lastItem, pageSize, userAlias);
