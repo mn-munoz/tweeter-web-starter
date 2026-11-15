@@ -1,3 +1,4 @@
+// AI-assisted: see AI-ATTRIBUTION.md
 import { AuthToken, Status, FakeData, StatusDto } from "tweeter-shared";
 import { Service } from "./Service";
 
@@ -12,7 +13,7 @@ export class StatusService implements Service {
     authToken: string,
     userAlias: string,
     pageSize: number,
-    lastItem: Status | null,
+    lastItem: StatusDto | null,
   ): Promise<[StatusDto[], boolean]> {
     return this.getFakeData(lastItem, pageSize);
   }
@@ -21,7 +22,7 @@ export class StatusService implements Service {
     authToken: string,
     userAlias: string,
     pageSize: number,
-    lastItem: Status | null,
+    lastItem: StatusDto | null,
   ): Promise<[StatusDto[], boolean]> {
     return this.getFakeData(lastItem, pageSize);
   }
