@@ -1,15 +1,36 @@
-import { AuthToken, User, FakeData } from "tweeter-shared";
+// AI-assisted: see AI-ATTRIBUTION.md
+import { AuthToken, User, FakeData, PagedUserItemRequest } from "tweeter-shared";
 import { Service } from "./Service";
+import { ServerFacade } from "../network/ServerFacade";
 
 export class FollowService implements Service {
+  private _serverFacade: ServerFacade | null = null;
+
+  // Factory method so tests can override it to supply a mock ServerFacade.
+  protected createServerFacade(): ServerFacade {
+    return new ServerFacade();
+  }
+
+  protected get serverFacade(): ServerFacade {
+    if (this._serverFacade === null) {
+      this._serverFacade = this.createServerFacade();
+    }
+    return this._serverFacade;
+  }
+
   public async loadMoreFollowees(
     authToken: AuthToken,
     userAlias: string,
     pageSize: number,
     lastItem: User | null,
   ): Promise<[User[], boolean]>{
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getPageOfUsers(lastItem, pageSize, userAlias);
+    const request: PagedUserItemRequest = {
+      token: authToken.token,
+      userAlias: userAlias,
+      pageSize: pageSize,
+      lastItem: lastItem ? lastItem.dto : null,
+    };
+    return this.serverFacade.getMoreFollowees(request);
   };
 
   public async loadMoreFollowers(
