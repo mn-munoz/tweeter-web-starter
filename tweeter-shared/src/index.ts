@@ -17,12 +17,14 @@ export type { TweeterRequest } from "./model/net/request/TweeterRequest";
 export type { PagedItemRequest } from "./model/net/request/PagedItemRequest";
 export type { PagedUserItemRequest } from "./model/net/request/PagedUserItemRequest";
 export type { PagedStatusItemRequest } from "./model/net/request/PagedStatusItemRequest";
+export type { FollowCountRequest } from "./model/net/request/FollowCountRequest";
 
 // Responses
 export type { TweeterResponse } from "./model/net/response/TweeterResponse";
 export type { PagedItemResponse } from "./model/net/response/PagedItemResponse";
 export type { PagedUserItemResponse } from "./model/net/response/PagedUserItemResponse";
 export type { PagedStatusItemResponse } from "./model/net/response/PagedStatusItemResponse";
+export type { FollowCountResponse } from "./model/net/response/FollowCountResponse";
 
 // Other
 export { FakeData } from "./util/FakeData";

@@ -1,10 +1,8 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { TweeterRequest } from "./TweeterRequest";
+import { AuthenticatedRequest } from "./AuthenticatedRequest";
 
 // Generic request for a page of items of type T (e.g. UserDto, StatusDto).
-export interface PagedItemRequest<T> extends TweeterRequest {
-    readonly token: string;
-    readonly userAlias: string;
+export interface PagedItemRequest<T> extends AuthenticatedRequest {
     readonly pageSize: number;
     readonly lastItem: T | null;
 }
