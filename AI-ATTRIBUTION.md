@@ -82,3 +82,8 @@
 - Tool: Claude Code
 - Task: Add the /status/story/add endpoint, including the lambda, the template entry, and the client-side code so the web app calls it.
 - Review: DONE
+
+## 2026-11-16: tweeter-web/test/network/ServerFacade.test.ts (new file), tweeter-web/package.json, package-lock.json
+- Tool: Claude Code
+- Task: Write integration tests for the register endpoint in tweeter-web's ServerFacade, checking that the server returns Allen Anderson, and install isomorphic-fetch so the tests can call fetch.
+- Review: DONE
