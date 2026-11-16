@@ -218,6 +218,19 @@ Resources:
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
 
+          /follow/followers/status:
+              post:
+                consumes: *commonConsumes
+                produces: *commonProduces
+                x-amazon-apigateway-integration:
+                  type: aws
+                  httpMethod: POST
+                  uri:
+                    ##### TODO: Set function name
+                    Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${getFollowerStatusLambda.Arn}/invocations
+                  requestTemplates: *commonRequestTemplates
+                  responses: *commonAmazonResponses
+                responses: *commonSwaggerResponses
 
   #
   # SQS Queues  (This will become relevant in Milestone 4. For M3, leave this section commented out.)
@@ -367,6 +380,20 @@ Resources:
           Properties:
             RestApiId: !Ref tweeterApi
             Path: /follow/followers/count
+            Method: POST
+
+  getFollowerStatusLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: getFollowerStatusLambda 
+      Handler: lambda/follow/GetFollowerStatusLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /follow/followers/status
             Method: POST
 
 
