@@ -15,15 +15,15 @@ export class UserService implements Service {
   public async login(
     alias: string,
     password: string,
-  ): Promise<[User, AuthToken]> {
-    // TODO: Replace with the result of calling the server
+  ): Promise<[UserDto, AuthTokenDto]> {
+    // TODO: Replace with the result of calling the database
     const user = FakeData.instance.firstUser;
 
     if (user === null) {
       throw new Error("Invalid alias or password");
     }
 
-    return [user, FakeData.instance.authToken];
+    return [user.dto, FakeData.instance.authToken.dto];
   }
 
   public async register(

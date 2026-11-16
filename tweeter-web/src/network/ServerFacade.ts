@@ -12,6 +12,7 @@ import {
   PagedItemResponse,
   PagedStatusItemRequest,
   PagedUserItemRequest,
+  LoginRequest,
   RegisterRequest,
   Status,
   User,
@@ -142,6 +143,26 @@ export class ServerFacade {
     if (response.success) {
       if (user == null || authToken == null) {
         throw new Error("Invalid registration");
+      } else {
+        return [user, authToken];
+      }
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async login(request: LoginRequest): Promise<[User, AuthToken]> {
+    const response = await this.clientCommunicator.doPost<LoginRequest, AuthenticationResponse>(request, "/auth/user/login");
+
+    // Convert the DTOs returned by ClientCommunicator to domain objects
+    const user: User | null = response.success ? User.fromDto(response.user) : null;
+    const authToken: AuthToken | null = response.success ? AuthToken.fromDto(response.authToken) : null;
+
+    // Handle errors
+    if (response.success) {
+      if (user == null || authToken == null) {
+        throw new Error("Invalid alias or password");
       } else {
         return [user, authToken];
       }
