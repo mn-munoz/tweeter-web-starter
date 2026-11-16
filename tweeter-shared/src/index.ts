@@ -23,6 +23,7 @@ export type { FollowStatusRequest } from "./model/net/request/FollowStatusReques
 export type { ChangeFollowRequest } from "./model/net/request/ChangeFollowRequest";
 export type { RegisterRequest } from "./model/net/request/RegisterRequest";
 export type { LoginRequest } from "./model/net/request/LoginRequest";
+export type { LogoutRequest } from "./model/net/request/LogoutRequest";
 
 // Responses
 export type { TweeterResponse } from "./model/net/response/TweeterResponse";
@@ -33,6 +34,7 @@ export type { FollowCountResponse } from "./model/net/response/FollowCountRespon
 export type { FollowStatusResponse } from "./model/net/response/FollowStatusResponse";
 export type { ChangeFollowResponse } from "./model/net/response/ChangeFollowResponse";
 export type { AuthenticationResponse } from "./model/net/response/AuthenticationResponse";
+export type { LogoutResponse } from "./model/net/response/LogoutResponse";
 
 // Other
 export { FakeData } from "./util/FakeData";
