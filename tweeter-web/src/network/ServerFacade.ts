@@ -12,6 +12,8 @@ import {
   PagedItemResponse,
   PagedStatusItemRequest,
   PagedUserItemRequest,
+  GetUserRequest,
+  GetUserResponse,
   LoginRequest,
   LogoutRequest,
   LogoutResponse,
@@ -84,6 +86,13 @@ export class ServerFacade {
 
   public async logout(request: LogoutRequest): Promise<void> {
     await this.post<LogoutRequest, LogoutResponse>(request, "/auth/user/logout");
+  }
+
+  public async getUser(request: GetUserRequest): Promise<User | null> {
+    const response = await this.post<GetUserRequest, GetUserResponse>(request, "/user/get");
+
+    // Convert the DTO returned by ClientCommunicator to a domain object (null if no user has the alias)
+    return User.fromDto(response.user);
   }
 
   // Posts a request and returns the response, logging and throwing the server's message if it was unsuccessful.

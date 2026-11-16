@@ -1,6 +1,6 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { Buffer } from "buffer";
-import { AuthToken, User, FakeData, LoginRequest, LogoutRequest, RegisterRequest } from "tweeter-shared";
+import { AuthToken, User, GetUserRequest, LoginRequest, LogoutRequest, RegisterRequest } from "tweeter-shared";
 import { Service } from "./Service";
 import { ServerFacade } from "../network/ServerFacade";
 
@@ -23,8 +23,11 @@ export class UserService implements Service {
     authToken: AuthToken,
     alias: string,
   ): Promise<User | null> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+    const request: GetUserRequest = {
+      token: authToken.token,
+      userAlias: alias,
+    };
+    return this.serverFacade.getUser(request);
   }
 
   public async login(

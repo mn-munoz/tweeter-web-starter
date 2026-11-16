@@ -72,3 +72,8 @@
 - Tool: Claude Code
 - Task: Refactor ServerFacade to remove duplicated response and error handling, leaving lambda error mapping for a later part of the project.
 - Review: DONE
+
+## 2026-11-15: tweeter-shared/src/model/net/request/GetUserRequest.ts (new file), tweeter-shared/src/model/net/response/GetUserResponse.ts (new file), tweeter-shared/src/index.ts, tweeter-server/src/lambda/user/GetUserLambda.ts (new file), tweeter-server/src/model/service/UserService.ts, tweeter-server/template.yaml, tweeter-web/src/network/ServerFacade.ts, tweeter-web/src/model.service/UserService.ts
+- Tool: Claude Code
+- Task: Add the /user/get endpoint, including the lambda, the template entry, and the client-side code so the web app calls it.
+- Review: DONE

@@ -1,15 +1,16 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { Buffer } from "buffer";
-import { AuthToken, AuthTokenDto, User, UserDto, FakeData } from "tweeter-shared";
+import { AuthTokenDto, UserDto, FakeData } from "tweeter-shared";
 import { Service } from "./Service";
 
 export class UserService implements Service {
   public async getUser(
-    authToken: AuthToken,
+    token: string,
     alias: string,
-  ): Promise<User | null> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.findUserByAlias(alias);
+  ): Promise<UserDto | null> {
+    // TODO: Replace with the result of calling the database
+    const user = FakeData.instance.findUserByAlias(alias);
+    return user === null ? null : user.dto;
   }
 
   public async login(
