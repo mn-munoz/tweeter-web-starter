@@ -97,3 +97,8 @@
 - Tool: Claude Code
 - Task: Write integration tests for getFollowerCount and getFolloweeCount in tweeter-web's ServerFacade.
 - Review: DONE
+
+## 2026-11-16: tweeter-web/test/model.service/StatusService.test.ts (new file)
+- Tool: Claude Code
+- Task: Write an integration test for the client-side StatusService that checks a successful story retrieval (loadMoreStoryItems) against the server.
+- Review: DONE
