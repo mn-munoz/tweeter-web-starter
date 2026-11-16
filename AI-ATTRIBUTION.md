@@ -67,3 +67,8 @@
 - Tool: Claude Code
 - Task: Add the /auth/user/logout endpoint, including the lambda, the template entry, and the client-side code so the web app calls it.
 - Review: DONE
+
+## 2026-11-15: tweeter-web/src/network/ServerFacade.ts
+- Tool: Claude Code
+- Task: Refactor ServerFacade to remove duplicated response and error handling, leaving lambda error mapping for a later part of the project.
+- Review: DONE
