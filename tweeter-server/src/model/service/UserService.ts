@@ -1,5 +1,6 @@
+// AI-assisted: see AI-ATTRIBUTION.md
 import { Buffer } from "buffer";
-import { AuthToken, User, FakeData } from "tweeter-shared";
+import { AuthToken, AuthTokenDto, User, UserDto, FakeData } from "tweeter-shared";
 import { Service } from "./Service";
 
 export class UserService implements Service {
@@ -30,21 +31,18 @@ export class UserService implements Service {
     lastName: string,
     alias: string,
     password: string,
-    userImageBytes: Uint8Array,
+    userImageBytes: string,
     imageFileExtension: string,
-  ): Promise<[User, AuthToken]> {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
-    const imageStringBase64: string =
-      Buffer.from(userImageBytes).toString("base64");
-
-    // TODO: Replace with the result of calling the server
+  ): Promise<[UserDto, AuthTokenDto]> {
+    // userImageBytes is a base64-encoded string sent by the client.
+    // TODO: Replace with the result of calling the database
     const user = FakeData.instance.firstUser;
 
     if (user === null) {
       throw new Error("Invalid registration");
     }
 
-    return [user, FakeData.instance.authToken];
+    return [user.dto, FakeData.instance.authToken.dto];
   }
 
   public async logout(authToken: AuthToken): Promise<void> {

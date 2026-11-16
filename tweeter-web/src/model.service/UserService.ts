@@ -1,8 +1,24 @@
+// AI-assisted: see AI-ATTRIBUTION.md
 import { Buffer } from "buffer";
-import { AuthToken, User, FakeData } from "tweeter-shared";
+import { AuthToken, User, FakeData, RegisterRequest } from "tweeter-shared";
 import { Service } from "./Service";
+import { ServerFacade } from "../network/ServerFacade";
 
 export class UserService implements Service {
+  private _serverFacade: ServerFacade | null = null;
+
+  // Factory method so tests can override it to supply a mock ServerFacade.
+  protected createServerFacade(): ServerFacade {
+    return new ServerFacade();
+  }
+
+  protected get serverFacade(): ServerFacade {
+    if (this._serverFacade === null) {
+      this._serverFacade = this.createServerFacade();
+    }
+    return this._serverFacade;
+  }
+
   public async getUser(
     authToken: AuthToken,
     alias: string,
@@ -33,18 +49,18 @@ export class UserService implements Service {
     userImageBytes: Uint8Array,
     imageFileExtension: string,
   ): Promise<[User, AuthToken]> {
-    // Not neded now, but will be needed when you make the request to the server in milestone 3
     const imageStringBase64: string =
       Buffer.from(userImageBytes).toString("base64");
 
-    // TODO: Replace with the result of calling the server
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid registration");
-    }
-
-    return [user, FakeData.instance.authToken];
+    const request: RegisterRequest = {
+      firstName: firstName,
+      lastName: lastName,
+      alias: alias,
+      password: password,
+      userImageBytes: imageStringBase64,
+      imageFileExtension: imageFileExtension,
+    };
+    return this.serverFacade.register(request);
   }
 
   public async logout(authToken: AuthToken): Promise<void> {

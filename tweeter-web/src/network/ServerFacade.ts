@@ -1,5 +1,7 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import {
+  AuthToken,
+  AuthenticationResponse,
   ChangeFollowRequest,
   ChangeFollowResponse,
   FollowCountRequest,
@@ -10,6 +12,7 @@ import {
   PagedItemResponse,
   PagedStatusItemRequest,
   PagedUserItemRequest,
+  RegisterRequest,
   Status,
   User,
 } from "tweeter-shared";
@@ -122,6 +125,26 @@ export class ServerFacade {
     // Handle errors
     if (response.success) {
       return [response.followerCount, response.followeeCount];
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async register(request: RegisterRequest): Promise<[User, AuthToken]> {
+    const response = await this.clientCommunicator.doPost<RegisterRequest, AuthenticationResponse>(request, "/auth/user/register");
+
+    // Convert the DTOs returned by ClientCommunicator to domain objects
+    const user: User | null = response.success ? User.fromDto(response.user) : null;
+    const authToken: AuthToken | null = response.success ? AuthToken.fromDto(response.authToken) : null;
+
+    // Handle errors
+    if (response.success) {
+      if (user == null || authToken == null) {
+        throw new Error("Invalid registration");
+      } else {
+        return [user, authToken];
+      }
     } else {
       console.error(response);
       throw new Error(response.message ?? undefined);

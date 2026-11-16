@@ -52,3 +52,8 @@
 - Tool: Claude Code
 - Task: Fix "Client communicator POST failed: Load failed" errors when following and unfollowing users.
 - Review: DONE
+
+## 2026-11-15: tweeter-shared/src/model/dto/AuthTokenDto.ts (new file), tweeter-shared/src/model/net/request/RegisterRequest.ts (new file), tweeter-shared/src/model/net/response/AuthenticationResponse.ts (new file), tweeter-shared/src/model/domain/AuthToken.ts, tweeter-shared/src/index.ts, tweeter-server/src/lambda/auth/RegisterLambda.ts (new file), tweeter-server/src/model/service/UserService.ts, tweeter-server/template.yaml, tweeter-web/src/network/ServerFacade.ts, tweeter-web/src/model.service/UserService.ts
+- Tool: Claude Code
+- Task: Add the /auth/user/register endpoint, including the lambda, the template entry, and the client-side code so the web app calls it.
+- Review: DONE 
