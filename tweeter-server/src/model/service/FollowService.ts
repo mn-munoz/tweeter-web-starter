@@ -60,8 +60,8 @@ export class FollowService implements Service {
   ): Promise<[followerCount: number, followeeCount: number]>{
     // TODO: Call the server
 
-    const followerCount = await this.getFollowerCount(userAliasToFollow, userAliasToFollow);
-    const followeeCount = await this.getFolloweeCount(userAliasToFollow, userAliasToFollow);
+    const followerCount = await this.getFollowerCount(authToken, userAliasToFollow);
+    const followeeCount = await this.getFolloweeCount(authToken, userAliasToFollow);
 
     return [followerCount, followeeCount];
   };
