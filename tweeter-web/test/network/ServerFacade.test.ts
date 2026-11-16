@@ -1,6 +1,11 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import "isomorphic-fetch";
-import { AuthToken, RegisterRequest, User } from "tweeter-shared";
+import {
+  AuthToken,
+  PagedUserItemRequest,
+  RegisterRequest,
+  User,
+} from "tweeter-shared";
 import { ServerFacade } from "../../src/network/ServerFacade";
 
 // Integration tests: these call the deployed server, which is assumed to be using FakeData.
@@ -38,5 +43,42 @@ describe("ServerFacade", () => {
     });
   });
 
-  
+  describe("getMoreFollowers", () => {
+    const pageSize = 3;
+    const firstPageRequest: PagedUserItemRequest = {
+      token: "abc123",
+      userAlias: "@allen",
+      pageSize: pageSize,
+      lastItem: null,
+    };
+
+    it("returns a non-empty page of users no larger than the page size", async () => {
+      const [followers, hasMore] = await serverFacade.getMoreFollowers(firstPageRequest);
+
+      expect(followers.length).toBeGreaterThan(0);
+      expect(followers.length).toBeLessThanOrEqual(pageSize);
+      expect(typeof hasMore).toBe("boolean");
+      for (const follower of followers) {
+        expect(follower).toBeInstanceOf(User);
+        expect(follower.alias.length).toBeGreaterThan(0);
+        expect(follower.firstName.length).toBeGreaterThan(0);
+        expect(follower.lastName.length).toBeGreaterThan(0);
+      }
+    });
+
+    it("returns a next page that starts after the last item of the previous page", async () => {
+      const [firstPage] = await serverFacade.getMoreFollowers(firstPageRequest);
+      const lastItem = firstPage[firstPage.length - 1];
+
+      const [secondPage] = await serverFacade.getMoreFollowers({
+        ...firstPageRequest,
+        lastItem: lastItem.dto,
+      });
+
+      const firstPageAliases = firstPage.map((user) => user.alias);
+      for (const follower of secondPage) {
+        expect(firstPageAliases).not.toContain(follower.alias);
+      }
+    });
+  });
 });
