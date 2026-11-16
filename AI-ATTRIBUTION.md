@@ -96,4 +96,4 @@
 ## 2026-11-16: tweeter-web/test/network/ServerFacade.test.ts
 - Tool: Claude Code
 - Task: Write integration tests for getFollowerCount and getFolloweeCount in tweeter-web's ServerFacade.
-- Review: TODO
+- Review: DONE
