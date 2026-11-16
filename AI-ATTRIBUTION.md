@@ -77,3 +77,8 @@
 - Tool: Claude Code
 - Task: Add the /user/get endpoint, including the lambda, the template entry, and the client-side code so the web app calls it.
 - Review: DONE
+
+## 2026-11-15: tweeter-shared/src/model/net/request/PostStatusRequest.ts (new file), tweeter-shared/src/model/net/response/PostStatusResponse.ts (new file), tweeter-shared/src/index.ts, tweeter-server/src/lambda/status/PostStatusLambda.ts (new file), tweeter-server/src/model/service/StatusService.ts, tweeter-server/template.yaml, tweeter-web/src/network/ServerFacade.ts, tweeter-web/src/model.service/StatusService.ts
+- Tool: Claude Code
+- Task: Add the /status/story/add endpoint, including the lambda, the template entry, and the client-side code so the web app calls it.
+- Review: DONE

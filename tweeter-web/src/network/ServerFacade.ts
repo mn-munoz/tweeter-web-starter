@@ -17,6 +17,8 @@ import {
   LoginRequest,
   LogoutRequest,
   LogoutResponse,
+  PostStatusRequest,
+  PostStatusResponse,
   RegisterRequest,
   Status,
   TweeterRequest,
@@ -53,6 +55,10 @@ export class ServerFacade {
     request: PagedStatusItemRequest,
   ): Promise<[Status[], boolean]> {
     return this.getMoreItems(request, "/status/story/list", Status.fromDto, "story posts");
+  }
+
+  public async postStatus(request: PostStatusRequest): Promise<void> {
+    await this.post<PostStatusRequest, PostStatusResponse>(request, "/status/story/add");
   }
 
   public async getFolloweeCount(request: FollowCountRequest): Promise<number> {

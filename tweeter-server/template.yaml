@@ -192,6 +192,19 @@ Resources:
                 responses: *commonAmazonResponses
               responses: *commonSwaggerResponses
 
+          /status/story/add:
+            post:
+              consumes: *commonConsumes
+              produces: *commonProduces
+              x-amazon-apigateway-integration:
+                type: aws
+                httpMethod: POST
+                uri:
+                  Fn::Sub: arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${postStatusLambda.Arn}/invocations
+                requestTemplates: *commonRequestTemplates
+                responses: *commonAmazonResponses
+              responses: *commonSwaggerResponses
+
           /follow/followees/count:
             post:
               consumes: *commonConsumes
@@ -429,6 +442,20 @@ Resources:
           Properties:
             RestApiId: !Ref tweeterApi
             Path: /status/story/list
+            Method: POST
+
+  postStatusLambda:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: postStatusLambda
+      Handler: lambda/status/PostStatusLambda.handler
+      Policies: *commonPolicies
+      Events:
+        PostApi:
+          Type: Api
+          Properties:
+            RestApiId: !Ref tweeterApi
+            Path: /status/story/add
             Method: POST
 
   getFolloweeCount:

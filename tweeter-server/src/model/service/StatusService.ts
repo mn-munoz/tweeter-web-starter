@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { AuthToken, Status, FakeData, StatusDto } from "tweeter-shared";
+import { Status, FakeData, StatusDto } from "tweeter-shared";
 import { Service } from "./Service";
 
 export class StatusService implements Service {
@@ -28,12 +28,10 @@ export class StatusService implements Service {
   }
 
   public async postStatus(
-    authToken: AuthToken,
-    newStatus: Status,
+    authToken: string,
+    newStatus: StatusDto,
   ): Promise<void> {
     // Pause so we can see the logging out message. Remove when connected to the server
-    await new Promise((f) => setTimeout(f, 2000));
-
-    // TODO: Call the server to post the status
+    // TODO: Add the status to the user's story (and followers' feeds) in the database
   }
 }
