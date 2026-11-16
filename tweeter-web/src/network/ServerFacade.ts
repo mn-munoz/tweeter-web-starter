@@ -1,5 +1,7 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import {
+  FollowCountRequest,
+  FollowCountResponse,
   PagedItemRequest,
   PagedItemResponse,
   PagedStatusItemRequest,
@@ -64,6 +66,18 @@ export class ServerFacade {
       } else {
         return [items, response.hasMore];
       }
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async getFolloweeCount(request: FollowCountRequest, endpoint:string ): Promise<number> {
+    const response = await this.clientCommunicator.doPost<FollowCountRequest, FollowCountResponse>(request, "/follow/followees/count");
+
+    // Handle errors
+    if (response.success) {
+      return response.count;
     } else {
       console.error(response);
       throw new Error(response.message ?? undefined);

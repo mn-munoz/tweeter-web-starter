@@ -1,6 +1,6 @@
-import { TweeterRequest } from "./TweeterRequest";
+import { UserAliasRequest } from "./UserAliasRequest";
 
-export interface FollowCountRequest extends TweeterRequest {
+export interface FollowCountRequest extends UserAliasRequest {
     readonly token: string;
     readonly userAlias: string;
 }
