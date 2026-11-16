@@ -109,7 +109,15 @@ export class ServerFacade {
   }
 
   public async follow(request: ChangeFollowRequest): Promise<[followerCount: number, followeeCount: number]> {
-    const response = await this.clientCommunicator.doPost<ChangeFollowRequest, ChangeFollowResponse>(request, "/follow/followees/add");
+    return this.changeFollow(request, "/follow/followees/add");
+  }
+
+  public async unfollow(request: ChangeFollowRequest): Promise<[followerCount: number, followeeCount: number]> {
+    return this.changeFollow(request, "/follow/followees/remove");
+  }
+
+  private async changeFollow(request: ChangeFollowRequest, endpoint: string): Promise<[followerCount: number, followeeCount: number]> {
+    const response = await this.clientCommunicator.doPost<ChangeFollowRequest, ChangeFollowResponse>(request, endpoint);
 
     // Handle errors
     if (response.success) {

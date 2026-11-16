@@ -42,3 +42,13 @@
 - Tool: Claude Code
 - Task: Import ChangeFollowRequest into FollowUserLambda.
 - Review: DONE
+
+## 2026-11-15: tweeter-server/template.yaml
+- Tool: Claude Code
+- Task: Fix the SAM deploy failure (AWS::EarlyValidation::ResourceExistenceCheck) when deploying the lambdas.
+- Review: DONE
+
+## 2026-11-15: tweeter-web/src/network/ServerFacade.ts, tweeter-server/src/lambda/follow/FollowUserLambda.ts
+- Tool: Claude Code
+- Task: Fix "Client communicator POST failed: Load failed" errors when following and unfollowing users.
+- Review: DONE
