@@ -1,5 +1,4 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { Buffer } from "buffer";
 import { AuthTokenDto, UserDto, FakeData } from "tweeter-shared";
 import { Service } from "./Service";
 
