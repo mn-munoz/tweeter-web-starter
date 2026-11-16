@@ -37,3 +37,8 @@
 - Tool: Claude Code
 - Task: Refactor the near-identical GetFolloweeCount and GetFollowerCount lambdas to remove duplicated code.
 - Review: DONE
+
+## 2026-11-15: tweeter-server/src/lambda/follow/FollowUserLambda.ts
+- Tool: Claude Code
+- Task: Import ChangeFollowRequest into FollowUserLambda.
+- Review: DONE

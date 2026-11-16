@@ -1,5 +1,7 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import {
+  ChangeFollowRequest,
+  ChangeFollowResponse,
   FollowCountRequest,
   FollowCountResponse,
   FollowStatusRequest,
@@ -100,6 +102,18 @@ export class ServerFacade {
     // Handle errors
     if (response.success) {
       return response.isFollower;
+    } else {
+      console.error(response);
+      throw new Error(response.message ?? undefined);
+    }
+  }
+
+  public async follow(request: ChangeFollowRequest): Promise<[followerCount: number, followeeCount: number]> {
+    const response = await this.clientCommunicator.doPost<ChangeFollowRequest, ChangeFollowResponse>(request, "/follow/followees/add");
+
+    // Handle errors
+    if (response.success) {
+      return [response.followerCount, response.followeeCount];
     } else {
       console.error(response);
       throw new Error(response.message ?? undefined);
