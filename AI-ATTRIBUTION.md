@@ -92,3 +92,8 @@
 - Tool: Claude Code
 - Task: Write integration tests for getFollowers (getMoreFollowers) in tweeter-web's ServerFacade.
 - Review: DONE
+
+## 2026-11-16: tweeter-web/test/network/ServerFacade.test.ts
+- Tool: Claude Code
+- Task: Write integration tests for getFollowerCount and getFolloweeCount in tweeter-web's ServerFacade.
+- Review: TODO

@@ -2,6 +2,7 @@
 import "isomorphic-fetch";
 import {
   AuthToken,
+  FollowCountRequest,
   PagedUserItemRequest,
   RegisterRequest,
   User,
@@ -79,6 +80,27 @@ describe("ServerFacade", () => {
       for (const follower of secondPage) {
         expect(firstPageAliases).not.toContain(follower.alias);
       }
+    });
+  });
+
+  describe("follow counts", () => {
+    const countRequest: FollowCountRequest = {
+      token: "abc123",
+      userAlias: "@allen",
+    };
+
+    it("getFollowerCount returns a whole number greater than zero", async () => {
+      const count = await serverFacade.getFollowerCount(countRequest);
+
+      expect(Number.isInteger(count)).toBe(true);
+      expect(count).toBeGreaterThan(0);
+    });
+
+    it("getFolloweeCount returns a whole number that is not negative", async () => {
+      const count = await serverFacade.getFolloweeCount(countRequest);
+
+      expect(Number.isInteger(count)).toBe(true);
+      expect(count).toBeGreaterThanOrEqual(0);
     });
   });
 });
