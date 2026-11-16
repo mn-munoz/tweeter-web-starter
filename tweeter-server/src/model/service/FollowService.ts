@@ -67,14 +67,14 @@ export class FollowService implements Service {
   };
 
   public async unfollow(
-    authToken: AuthToken,
-    userToUnfollow: User,
+    authToken: string,
+    userAliasToUnfollow: string,
   ): Promise<[followerCount: number, followeeCount: number]>{
 
     // TODO: Call the server
 
-    const followerCount = await this.getFollowerCount(authToken.token, userToUnfollow.alias);
-    const followeeCount = await this.getFolloweeCount(authToken.token, userToUnfollow.alias);
+    const followerCount = await this.getFollowerCount(authToken, userAliasToUnfollow);
+    const followeeCount = await this.getFolloweeCount(authToken, userAliasToUnfollow);
 
     return [followerCount, followeeCount];
   };
