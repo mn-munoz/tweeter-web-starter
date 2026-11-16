@@ -32,3 +32,8 @@
 - Tool: Claude Code
 - Task: Remove the duplicated request/convert/error-handling code in ServerFacade.ts in tweeter-web.
 - Review: DONE
+
+## 2026-11-15: tweeter-server/src/lambda/follow/FollowCountHandler.ts (new file), tweeter-server/src/lambda/follow/GetFolloweeCount.ts, tweeter-server/src/lambda/follow/GetFollowerCount.ts
+- Tool: Claude Code
+- Task: Refactor the near-identical GetFolloweeCount and GetFollowerCount lambdas to remove duplicated code.
+- Review: DONE

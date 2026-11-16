@@ -72,8 +72,16 @@ export class ServerFacade {
     }
   }
 
-  public async getFolloweeCount(request: FollowCountRequest, endpoint:string ): Promise<number> {
-    const response = await this.clientCommunicator.doPost<FollowCountRequest, FollowCountResponse>(request, "/follow/followees/count");
+  public async getFolloweeCount(request: FollowCountRequest): Promise<number> {
+    return this.getCount(request, "/follow/followees/count");
+  }
+
+  public async getFollowerCount(request: FollowCountRequest): Promise<number> {
+    return this.getCount(request, "/follow/followers/count");
+  }
+
+  private async getCount(request: FollowCountRequest, endpoint:string): Promise<number> {
+    const response = await this.clientCommunicator.doPost<FollowCountRequest, FollowCountResponse>(request, endpoint);
 
     // Handle errors
     if (response.success) {
