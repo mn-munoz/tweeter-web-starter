@@ -117,3 +117,8 @@
 - Tool: Claude Code
 - Task: Normalize the alias in register so it always starts with "@" (e.g. "bob" becomes "@bob").
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/service/UserService.ts, tweeter-server/src/lambda/auth/LogoutLambda.ts
+- Tool: Claude Code
+- Task: Implement logout by deleting the user's auth token from the authtoken table, and map logout errors to API Gateway status codes.
+- Review: DONE

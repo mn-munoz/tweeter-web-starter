@@ -94,7 +94,12 @@ export class UserService implements Service {
     return `${safeAlias}.${extension.replace(/^\./, "")}`;
   }
 
+  // Deleting the token ends the session. Logging out with a token that is
+  // already gone (expired, or logged out in another tab) still succeeds.
   public async logout(token: string): Promise<void> {
-    // TODO: Invalidate the auth token in the database
+    if (!token) {
+      throw badRequest("An auth token is required to log out");
+    }
+    await this.authTokenDAO.delete(token);
   }
 }
