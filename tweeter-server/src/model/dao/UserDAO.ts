@@ -9,7 +9,8 @@ export interface UserDAO {
 
   getPasswordHash(alias: string): Promise<string | null>;
 
-  createUser(user: UserDto, passwordHash: string): Promise<void>;
+  // Returns false (and stores nothing) if a user with that alias already exists.
+  createUser(user: UserDto, passwordHash: string): Promise<boolean>;
 
   getFollowerCount(alias: string): Promise<number>;
 

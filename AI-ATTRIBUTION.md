@@ -107,3 +107,8 @@
 - Tool: Claude Code
 - Task: Step 1 of the Milestone 4A plan: create database-agnostic DAO interfaces (user, auth token, follow, status, S3 image), a DataPage class, and the DAOFactory abstract factory interface.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/dao/dynamo/DynamoBase.ts (new file), tweeter-server/src/model/dao/dynamo/DynamoUserDAO.ts (new file), tweeter-server/src/model/dao/dynamo/DynamoAuthTokenDAO.ts (new file), tweeter-server/src/model/dao/dynamo/DynamoDAOFactory.ts (new file), tweeter-server/src/model/dao/s3/S3ImageDAO.ts (new file), tweeter-server/src/model/service/ServiceErrors.ts (new file), tweeter-server/src/lambda/withErrorMapping.ts (new file), tweeter-server/src/model/dao/UserDAO.ts, tweeter-server/src/model/service/UserService.ts, tweeter-server/src/lambda/auth/RegisterLambda.ts, tweeter-server/src/lambda/auth/LoginLambda.ts, tweeter-server/src/lambda/auth/LogoutLambda.ts, tweeter-server/src/lambda/user/GetUserLambda.ts, tweeter-server/template.yaml, tweeter-server/layer/nodejs/node_modules/bcryptjs/ (new, copied from node_modules)
+- Tool: Claude Code
+- Task: Implement register end to end: DynamoDB user and authtoken DAOs, S3 image DAO, DynamoDAOFactory, bcrypt password hashing in UserService.register, error-tag mapping for API Gateway, and the user/authtoken tables in template.yaml.
+- Review: DONE

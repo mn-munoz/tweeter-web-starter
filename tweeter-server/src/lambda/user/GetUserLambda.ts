@@ -1,9 +1,10 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { GetUserRequest, GetUserResponse } from "tweeter-shared";
+import { DynamoDAOFactory } from "../../model/dao/dynamo/DynamoDAOFactory";
 import { UserService } from "../../model/service/UserService";
 
 export const handler = async (request: GetUserRequest): Promise<GetUserResponse> => {
-    const userService = new UserService();
+    const userService = new UserService(new DynamoDAOFactory());
     const user = await userService.getUser(request.token, request.userAlias);
 
     return {

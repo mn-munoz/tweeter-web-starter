@@ -1,9 +1,11 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { AuthenticationResponse, RegisterRequest } from "tweeter-shared";
+import { DynamoDAOFactory } from "../../model/dao/dynamo/DynamoDAOFactory";
 import { UserService } from "../../model/service/UserService";
+import { withErrorMapping } from "../withErrorMapping";
 
-export const handler = async (request: RegisterRequest): Promise<AuthenticationResponse> => {
-    const userService = new UserService();
+export const handler = withErrorMapping(async (request: RegisterRequest): Promise<AuthenticationResponse> => {
+    const userService = new UserService(new DynamoDAOFactory());
     const [user, authToken] = await userService.register(
         request.firstName,
         request.lastName,
@@ -19,4 +21,4 @@ export const handler = async (request: RegisterRequest): Promise<AuthenticationR
         user: user,
         authToken: authToken,
     };
-}
+});
