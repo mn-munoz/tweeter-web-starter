@@ -1,7 +1,23 @@
+// AI-assisted: see AI-ATTRIBUTION.md
 import { User, FakeData, UserDto } from "tweeter-shared";
+import { DAOFactory } from "../dao/DAOFactory";
+import { UserDAO } from "../dao/UserDAO";
+import { AuthorizationService } from "./AuthorizationService";
 import { Service } from "./Service";
 
 export class FollowService implements Service {
+  private readonly userDAO: UserDAO;
+  private readonly authorizationService: AuthorizationService;
+
+  // authorizationService can be passed in (e.g. a mock in tests); by default
+  // it is built from the same factory.
+  public constructor(
+    daoFactory: DAOFactory,
+    authorizationService: AuthorizationService = new AuthorizationService(daoFactory),
+  ) {
+    this.userDAO = daoFactory.getUserDAO();
+    this.authorizationService = authorizationService;
+  }
 
   private async getFakeData(lastItem: UserDto | null, pageSize: number, userAlias: string): Promise<[UserDto[], boolean]> {
     const [items, hasMore] = FakeData.instance.getPageOfUsers(User.fromDto(lastItem), pageSize, userAlias);
@@ -38,12 +54,13 @@ export class FollowService implements Service {
     return FakeData.instance.isFollower();
   };
 
+  // The count is stored on the user's item and kept up to date by follow/unfollow.
   public async getFolloweeCount(
     authToken: string,
     userAlias: string,
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFolloweeCount(userAlias);
+    await this.authorizationService.authorize(authToken);
+    return this.userDAO.getFolloweeCount(userAlias);
   };
 
   public async getFollowerCount(

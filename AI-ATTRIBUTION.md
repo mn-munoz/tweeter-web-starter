@@ -132,3 +132,8 @@
 - Tool: Claude Code
 - Task: Implement AuthorizationService (token lookup, 60-minute idle timeout, session refresh) and use it to implement getUser from DynamoDB; stop AuthTokenDAO.touch from recreating deleted tokens.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/service/FollowService.ts, tweeter-server/src/lambda/follow/GetFolloweeCount.ts, tweeter-server/src/lambda/follow/FollowUserLambda.ts, tweeter-server/src/lambda/follow/UnfollowUserLambda.ts, tweeter-server/src/lambda/follow/GetFolloweesLambda.ts, tweeter-server/src/lambda/follow/GetFollowersLambda.ts, tweeter-server/src/lambda/follow/GetFollowerCount.ts, tweeter-server/src/lambda/follow/GetFollowerStatusLambda.ts
+- Tool: Claude Code
+- Task: Implement getFolloweeCount: authorize the token and read the stored followee count from the user table. Give FollowService a DAOFactory constructor and pass the factory in from every follow lambda.
+- Review: DONE
