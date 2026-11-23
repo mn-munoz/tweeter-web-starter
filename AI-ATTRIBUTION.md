@@ -112,3 +112,8 @@
 - Tool: Claude Code
 - Task: Implement register end to end: DynamoDB user and authtoken DAOs, S3 image DAO, DynamoDAOFactory, bcrypt password hashing in UserService.register, error-tag mapping for API Gateway, and the user/authtoken tables in template.yaml.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/service/UserService.ts
+- Tool: Claude Code
+- Task: Normalize the alias in register so it always starts with "@" (e.g. "bob" becomes "@bob").
+- Review: DONE

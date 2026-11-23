@@ -53,7 +53,8 @@ export class UserService implements Service {
     imageFileExtension: string,
   ): Promise<[UserDto, AuthTokenDto]> {
     // userImageBytes is a base64-encoded string sent by the client.
-    if (!firstName || !lastName || !alias || !password || !userImageBytes || !imageFileExtension) {
+    alias = this.normalizeAlias(alias ?? "");
+    if (!firstName || !lastName || alias === "@" || !password || !userImageBytes || !imageFileExtension) {
       throw badRequest("All registration fields are required");
     }
 
@@ -78,6 +79,13 @@ export class UserService implements Service {
     await this.authTokenDAO.create(authToken, alias);
 
     return [user, authToken];
+  }
+
+  // Aliases are stored with a leading "@" (mentions and navigation rely on it),
+  // so "bob", " bob " and "@bob" all become "@bob".
+  private normalizeAlias(alias: string): string {
+    const trimmed = alias.trim();
+    return trimmed.startsWith("@") ? trimmed : "@" + trimmed;
   }
 
   // S3 key for a user's profile image, e.g. "@bob" + "png" -> "bob.png".
