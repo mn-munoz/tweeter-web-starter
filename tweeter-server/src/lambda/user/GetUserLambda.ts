@@ -2,8 +2,9 @@
 import { GetUserRequest, GetUserResponse } from "tweeter-shared";
 import { DynamoDAOFactory } from "../../model/dao/dynamo/DynamoDAOFactory";
 import { UserService } from "../../model/service/UserService";
+import { withErrorMapping } from "../withErrorMapping";
 
-export const handler = async (request: GetUserRequest): Promise<GetUserResponse> => {
+export const handler = withErrorMapping(async (request: GetUserRequest): Promise<GetUserResponse> => {
     const userService = new UserService(new DynamoDAOFactory());
     const user = await userService.getUser(request.token, request.userAlias);
 
@@ -12,4 +13,4 @@ export const handler = async (request: GetUserRequest): Promise<GetUserResponse>
         message: null,
         user: user,
     };
-}
+});

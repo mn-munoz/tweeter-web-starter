@@ -1,10 +1,11 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import bcrypt from "bcryptjs";
-import { AuthToken, AuthTokenDto, UserDto, FakeData } from "tweeter-shared";
+import { AuthToken, AuthTokenDto, UserDto } from "tweeter-shared";
 import { AuthTokenDAO } from "../dao/AuthTokenDAO";
 import { DAOFactory } from "../dao/DAOFactory";
 import { ImageDAO } from "../dao/ImageDAO";
 import { UserDAO } from "../dao/UserDAO";
+import { AuthorizationService } from "./AuthorizationService";
 import { Service } from "./Service";
 import { badRequest } from "./ServiceErrors";
 
@@ -14,20 +15,27 @@ export class UserService implements Service {
   private readonly userDAO: UserDAO;
   private readonly authTokenDAO: AuthTokenDAO;
   private readonly imageDAO: ImageDAO;
+  private readonly authorizationService: AuthorizationService;
 
-  public constructor(daoFactory: DAOFactory) {
+  // authorizationService can be passed in (e.g. a mock in tests); by default
+  // it is built from the same factory.
+  public constructor(
+    daoFactory: DAOFactory,
+    authorizationService: AuthorizationService = new AuthorizationService(daoFactory),
+  ) {
     this.userDAO = daoFactory.getUserDAO();
     this.authTokenDAO = daoFactory.getAuthTokenDAO();
     this.imageDAO = daoFactory.getImageDAO();
+    this.authorizationService = authorizationService;
   }
 
+  // Returns null if no user has the alias (the client then stays on the current page).
   public async getUser(
     token: string,
     alias: string,
   ): Promise<UserDto | null> {
-    // TODO: Replace with the result of calling the database
-    const user = FakeData.instance.findUserByAlias(alias);
-    return user === null ? null : user.dto;
+    await this.authorizationService.authorize(token);
+    return this.userDAO.getUser(this.normalizeAlias(alias ?? ""));
   }
 
   public async login(

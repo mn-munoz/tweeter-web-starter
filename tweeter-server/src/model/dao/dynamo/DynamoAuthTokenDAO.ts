@@ -1,4 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
+import { ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
 import { DeleteCommand, GetCommand, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import { AuthTokenDto } from "tweeter-shared";
 import { AuthTokenDAO, Session } from "../AuthTokenDAO";
@@ -43,15 +44,29 @@ export class DynamoAuthTokenDAO extends DynamoBase implements AuthTokenDAO {
   }
 
   public async touch(token: string, now: number): Promise<void> {
-    await this.client.send(
-      new UpdateCommand({
-        TableName: this.tableName,
-        Key: { [this.tokenAttr]: token },
-        UpdateExpression: "SET #lastUsed = :now, #expiresAt = :expiresAt",
-        ExpressionAttributeNames: { "#lastUsed": this.lastUsedAttr, "#expiresAt": this.expiresAtAttr },
-        ExpressionAttributeValues: { ":now": now, ":expiresAt": this.expiresAt(now) },
-      }),
-    );
+    try {
+      await this.client.send(
+        new UpdateCommand({
+          TableName: this.tableName,
+          Key: { [this.tokenAttr]: token },
+          UpdateExpression: "SET #lastUsed = :now, #expiresAt = :expiresAt",
+          // UpdateItem would otherwise create a new (alias-less) item if the
+          // token was deleted in the meantime, e.g. by a logout in another tab.
+          ConditionExpression: "attribute_exists(#token)",
+          ExpressionAttributeNames: {
+            "#token": this.tokenAttr,
+            "#lastUsed": this.lastUsedAttr,
+            "#expiresAt": this.expiresAtAttr,
+          },
+          ExpressionAttributeValues: { ":now": now, ":expiresAt": this.expiresAt(now) },
+        }),
+      );
+    } catch (error) {
+      if (!(error instanceof ConditionalCheckFailedException)) {
+        throw error;
+      }
+      // The token no longer exists, so there is nothing to extend.
+    }
   }
 
   public async delete(token: string): Promise<void> {

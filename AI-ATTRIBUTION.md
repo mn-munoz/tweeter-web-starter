@@ -127,3 +127,8 @@
 - Tool: Claude Code
 - Task: Implement login: normalize the alias, check the password with bcrypt against the stored hash, and create a new auth token; map login errors to API Gateway status codes.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/service/AuthorizationService.ts (new file), tweeter-server/src/model/service/UserService.ts, tweeter-server/src/lambda/user/GetUserLambda.ts, tweeter-server/src/model/dao/dynamo/DynamoAuthTokenDAO.ts
+- Tool: Claude Code
+- Task: Implement AuthorizationService (token lookup, 60-minute idle timeout, session refresh) and use it to implement getUser from DynamoDB; stop AuthTokenDAO.touch from recreating deleted tokens.
+- Review: DONE
