@@ -122,3 +122,8 @@
 - Tool: Claude Code
 - Task: Implement logout by deleting the user's auth token from the authtoken table, and map logout errors to API Gateway status codes.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/service/UserService.ts, tweeter-server/src/lambda/auth/LoginLambda.ts
+- Tool: Claude Code
+- Task: Implement login: normalize the alias, check the password with bcrypt against the stored hash, and create a new auth token; map login errors to API Gateway status codes.
+- Review: DONE

@@ -34,14 +34,31 @@ export class UserService implements Service {
     alias: string,
     password: string,
   ): Promise<[UserDto, AuthTokenDto]> {
-    // TODO: Replace with the result of calling the database
-    const user = FakeData.instance.firstUser;
-
-    if (user === null) {
-      throw new Error("Invalid alias or password");
+    alias = this.normalizeAlias(alias ?? "");
+    if (alias === "@" || !password) {
+      throw badRequest("Alias and password are required");
     }
 
-    return [user.dto, FakeData.instance.authToken.dto];
+    // Same message for an unknown alias and a wrong password, so the
+    // response doesn't reveal which aliases exist.
+    const passwordHash = await this.userDAO.getPasswordHash(alias);
+    if (passwordHash === null || !(await bcrypt.compare(password, passwordHash))) {
+      throw badRequest("Invalid alias or password");
+    }
+
+    const user = await this.userDAO.getUser(alias);
+    if (user === null) {
+      throw badRequest("Invalid alias or password");
+    }
+
+    return [user, await this.startSession(alias)];
+  }
+
+  // Creates and stores a new auth token for the user.
+  private async startSession(alias: string): Promise<AuthTokenDto> {
+    const authToken = AuthToken.Generate().dto;
+    await this.authTokenDAO.create(authToken, alias);
+    return authToken;
   }
 
   public async register(
@@ -75,10 +92,7 @@ export class UserService implements Service {
       throw badRequest(`Alias ${alias} is already taken`);
     }
 
-    const authToken = AuthToken.Generate().dto;
-    await this.authTokenDAO.create(authToken, alias);
-
-    return [user, authToken];
+    return [user, await this.startSession(alias)];
   }
 
   // Aliases are stored with a leading "@" (mentions and navigation rely on it),
