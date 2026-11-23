@@ -25,6 +25,11 @@ export class FollowService implements Service {
     return [dtos, hasMore];
   }
 
+  private async getCount(authToken: string, userAlias: string, countFunction: (alias: string) => Promise<number>): Promise<number> {
+    await this.authorizationService.authorize(authToken);
+    return countFunction(userAlias);
+  }
+
   public async loadMoreFollowees(
     authToken: string,
     userAlias: string,
@@ -59,16 +64,14 @@ export class FollowService implements Service {
     authToken: string,
     userAlias: string,
   ): Promise<number> {
-    await this.authorizationService.authorize(authToken);
-    return this.userDAO.getFolloweeCount(userAlias);
+    return this.getCount(authToken, userAlias, (alias) => this.userDAO.getFolloweeCount(alias));
   };
 
   public async getFollowerCount(
     authToken: string,
     userAlias: string,
   ): Promise<number> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.getFollowerCount(userAlias);
+    return this.getCount(authToken, userAlias, (alias) => this.userDAO.getFollowerCount(alias));
   };
 
   public async follow(
