@@ -192,3 +192,8 @@
 - Tool: Claude Code
 - Task: Implement DynamoFollowDAO.getAllFollowers by repeatedly calling the paged followers query until every follower has been read.
 - Review: DONE
+
+## 2026-11-24: tweeter-server/src/model/dao/dynamo/DynamoBase.ts, tweeter-server/src/model/dao/dynamo/DynamoStatusDAO.ts
+- Tool: Claude Code
+- Task: Add a batch-write helper to DynamoBase (chunks of 25, retrying unprocessed items with backoff) and use it to implement DynamoStatusDAO.batchPut.
+- Review: DONE

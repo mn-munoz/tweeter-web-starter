@@ -59,7 +59,10 @@ export class DynamoStatusDAO extends DynamoBase implements StatusDAO {
     };
   }
 
+  // One row per owner (e.g. per follower's feed), written in batches of 25.
   public async batchPut(ownerAliases: string[], status: StoredStatus): Promise<void> {
-    throw new Error("batchPut is not implemented yet");
+    // A batch may not contain the same key twice, so drop repeated owners.
+    const owners = [...new Set(ownerAliases)];
+    await this.batchWriteChunked(owners.map((owner) => this.toItem(owner, status)));
   }
 }
