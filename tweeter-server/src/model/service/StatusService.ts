@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { Status, FakeData, StatusDto, UserDto } from "tweeter-shared";
+import { StatusDto, UserDto } from "tweeter-shared";
 import { DAOFactory } from "../dao/DAOFactory";
 import { FollowDAO } from "../dao/FollowDAO";
 import { StatusDAO, StoredStatus } from "../dao/StatusDAO";
@@ -24,12 +24,6 @@ export class StatusService extends AuthorizedService {
     this.storyDAO = daoFactory.getStoryDAO();
     this.feedDAO = daoFactory.getFeedDAO();
     this.followDAO = daoFactory.getFollowDAO();
-  }
-
-  private async getFakeData(lastItem: StatusDto | null, pageSize: number): Promise<[StatusDto[], boolean]> {
-      const [items, hasMore] = FakeData.instance.getPageOfStatuses(Status.fromDto(lastItem), pageSize);
-      const dtos = items.map((status) => status.dto);
-      return [dtos, hasMore];
   }
 
   // Shared by the story and feed lists: authorizes, loads a page of stored
@@ -64,7 +58,7 @@ export class StatusService extends AuthorizedService {
     pageSize: number,
     lastItem: StatusDto | null,
   ): Promise<[StatusDto[], boolean]> {
-    return this.getFakeData(lastItem, pageSize);
+    return this.loadStatusPage(authToken, userAlias, pageSize, lastItem, this.feedDAO);
   }
 
   public async loadMoreStoryItems(

@@ -202,3 +202,8 @@
 - Tool: Claude Code
 - Task: Implement the feed fan-out in postStatus: after saving to the story, get all of the author's followers and batch-write the status into each follower's feed; make DAOFactory return the real feed DAO.
 - Review: DONE
+
+## 2026-11-24: tweeter-server/src/model/service/StatusService.ts, tweeter-server/src/lambda/status/GetFeedLambda.ts
+- Tool: Claude Code
+- Task: Implement the feed list by reading each user's precomputed feed from the feed table through the shared loadStatusPage helper, and remove the last FakeData use from the server.
+- Review: DONE
