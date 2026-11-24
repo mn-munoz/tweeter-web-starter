@@ -1,4 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
+import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { DataPage } from "../DataPage";
 import { StatusDAO, StoredStatus } from "../StatusDAO";
 import { DynamoBase } from "./DynamoBase";
@@ -44,7 +45,18 @@ export class DynamoStatusDAO extends DynamoBase implements StatusDAO {
   }
 
   public async put(ownerAlias: string, status: StoredStatus): Promise<void> {
-    throw new Error("put is not implemented yet");
+    await this.client.send(new PutCommand({ TableName: this.tableName, Item: this.toItem(ownerAlias, status) }));
+  }
+
+  // In the story table the owner and author attributes are the same
+  // ("author_alias"), so this just sets it once.
+  private toItem(ownerAlias: string, status: StoredStatus): Record<string, any> {
+    return {
+      [this.authorAttr]: status.authorAlias,
+      [this.ownerAttr]: ownerAlias,
+      [this.timestampAttr]: status.timestamp,
+      [this.postAttr]: status.post,
+    };
   }
 
   public async batchPut(ownerAliases: string[], status: StoredStatus): Promise<void> {

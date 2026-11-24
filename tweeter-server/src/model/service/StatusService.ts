@@ -1,10 +1,11 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { Status, FakeData, StatusDto, UserDto } from "tweeter-shared";
 import { DAOFactory } from "../dao/DAOFactory";
-import { StatusDAO } from "../dao/StatusDAO";
+import { StatusDAO, StoredStatus } from "../dao/StatusDAO";
 import { UserDAO } from "../dao/UserDAO";
 import { AuthorizationService } from "./AuthorizationService";
 import { AuthorizedService } from "./AuthorizedService";
+import { badRequest, unauthorized } from "./ServiceErrors";
 
 export class StatusService extends AuthorizedService {
   private readonly userDAO: UserDAO;
@@ -74,7 +75,26 @@ export class StatusService extends AuthorizedService {
     authToken: string,
     newStatus: StatusDto,
   ): Promise<void> {
-    // Pause so we can see the logging out message. Remove when connected to the server
-    // TODO: Add the status to the user's story (and followers' feeds) in the database
+    const currentAlias = await this.authorize(authToken);
+
+    // Users may only post as themselves.
+    if (newStatus?.user?.alias !== currentAlias) {
+      throw unauthorized("You can only post statuses as yourself");
+    }
+    if (!newStatus.post || newStatus.post.trim() === "") {
+      throw badRequest("A status cannot be empty");
+    }
+    if (typeof newStatus.timestamp !== "number") {
+      throw badRequest("A status needs a numeric timestamp");
+    }
+
+    const stored: StoredStatus = {
+      post: newStatus.post,
+      authorAlias: currentAlias,
+      timestamp: newStatus.timestamp,
+    };
+    await this.storyDAO.put(currentAlias, stored);
+
+    // TODO: Add the status to each follower's feed (next step, with the feed table).
   }
 }

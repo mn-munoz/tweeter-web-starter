@@ -176,4 +176,9 @@
 ## 2026-11-23: tweeter-server/src/model/service/AuthorizedService.ts (new file), tweeter-server/src/model/service/UserService.ts, tweeter-server/src/model/service/FollowService.ts, tweeter-server/src/model/service/StatusService.ts
 - Tool: Claude Code
 - Task: Move the AuthorizationService dependency out of the three services into a shared abstract AuthorizedService base class with a protected authorize method.
-- Review: TODO
+- Review: DONE
+
+## 2026-11-24: tweeter-server/src/model/service/StatusService.ts, tweeter-server/src/model/dao/dynamo/DynamoStatusDAO.ts, tweeter-server/src/lambda/status/PostStatusLambda.ts
+- Tool: Claude Code
+- Task: Implement posting a status to the author's story: authorize, check the author is the logged-in user and the post is valid, and store it with DynamoStatusDAO.put. Feed fan-out is left for the next step.
+- Review: DONE

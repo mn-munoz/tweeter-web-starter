@@ -2,8 +2,9 @@
 import { PostStatusRequest, PostStatusResponse } from "tweeter-shared";
 import { DynamoDAOFactory } from "../../model/dao/dynamo/DynamoDAOFactory";
 import { StatusService } from "../../model/service/StatusService";
+import { withErrorMapping } from "../withErrorMapping";
 
-export const handler = async (request: PostStatusRequest): Promise<PostStatusResponse> => {
+export const handler = withErrorMapping(async (request: PostStatusRequest): Promise<PostStatusResponse> => {
     const statusService = new StatusService(new DynamoDAOFactory());
     await statusService.postStatus(request.token, request.newStatus);
 
@@ -11,4 +12,4 @@ export const handler = async (request: PostStatusRequest): Promise<PostStatusRes
         success: true,
         message: null,
     };
-}
+});
