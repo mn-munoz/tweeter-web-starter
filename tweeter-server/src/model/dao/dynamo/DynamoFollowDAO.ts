@@ -5,6 +5,10 @@ import { DataPage } from "../DataPage";
 import { FollowDAO } from "../FollowDAO";
 import { DynamoBase } from "./DynamoBase";
 
+// Rows per query when reading every follower. DynamoDB also caps each response
+// at 1 MB, which the paging loop in getAllFollowers handles too.
+const ALL_FOLLOWERS_PAGE_SIZE = 1000;
+
 // follow table: partition key follower_handle, sort key followee_handle.
 // follow_index (GSI): partition key followee_handle, sort key follower_handle.
 export class DynamoFollowDAO extends DynamoBase implements FollowDAO {
@@ -129,7 +133,24 @@ export class DynamoFollowDAO extends DynamoBase implements FollowDAO {
     );
   }
 
+  // Every follower's alias (for fanning a new status out to feeds). Reuses the
+  // paged followers query, one large page at a time, until there are no more.
   public async getAllFollowers(followeeAlias: string): Promise<string[]> {
-    throw new Error("getAllFollowers is not implemented yet");
+    const followers: string[] = [];
+    let lastFollower: string | null = null;
+    let hasMore = true;
+
+    while (hasMore) {
+      const page: DataPage<string> = await this.getPageOfFollowers(
+        followeeAlias,
+        ALL_FOLLOWERS_PAGE_SIZE,
+        lastFollower,
+      );
+      followers.push(...page.items);
+      hasMore = page.hasMore && page.items.length > 0;
+      lastFollower = page.items.length > 0 ? page.items[page.items.length - 1] : null;
+    }
+
+    return followers;
   }
 }

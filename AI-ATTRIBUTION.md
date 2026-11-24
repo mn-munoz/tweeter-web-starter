@@ -187,3 +187,8 @@
 - Tool: Claude Code
 - Task: Add the feed DynamoDB table (partition key owner_alias, sort key timestamp) to template.yaml.
 - Review: DONE
+
+## 2026-11-24: tweeter-server/src/model/dao/dynamo/DynamoFollowDAO.ts
+- Tool: Claude Code
+- Task: Implement DynamoFollowDAO.getAllFollowers by repeatedly calling the paged followers query until every follower has been read.
+- Review: DONE
