@@ -6,6 +6,7 @@ import { FollowDAO } from "../dao/FollowDAO";
 import { UserDAO } from "../dao/UserDAO";
 import { AuthorizationService } from "./AuthorizationService";
 import { Service } from "./Service";
+import { badRequest } from "./ServiceErrors";
 
 export class FollowService implements Service {
   private readonly userDAO: UserDAO;
@@ -41,6 +42,13 @@ export class FollowService implements Service {
   private async getCount(authToken: string, userAlias: string, countFunction: (alias: string) => Promise<number>): Promise<number> {
     await this.authorizationService.authorize(authToken);
     return countFunction(userAlias);
+  }
+
+  // A user's [followerCount, followeeCount], without re-authorizing.
+  private async getCountsOf(alias: string): Promise<[followerCount: number, followeeCount: number]> {
+    const followerCount = await this.userDAO.getFollowerCount(alias);
+    const followeeCount = await this.userDAO.getFolloweeCount(alias);
+    return [followerCount, followeeCount];
   }
 
   public async loadMoreFollowees(
@@ -90,16 +98,28 @@ export class FollowService implements Service {
     return this.getCount(authToken, userAlias, (alias) => this.userDAO.getFollowerCount(alias));
   };
 
+  // The logged-in user (from the token, not the request) follows userAliasToFollow.
+  // Returns the followed user's new counts, which the client displays.
   public async follow(
     authToken: string,
     userAliasToFollow: string,
   ): Promise<[followerCount: number, followeeCount: number]>{
-    // TODO: Call the server
+    const currentAlias = await this.authorizationService.authorize(authToken);
 
-    const followerCount = await this.getFollowerCount(authToken, userAliasToFollow);
-    const followeeCount = await this.getFolloweeCount(authToken, userAliasToFollow);
+    if (currentAlias === userAliasToFollow) {
+      throw badRequest("You cannot follow yourself");
+    }
+    if ((await this.userDAO.getUser(userAliasToFollow)) === null) {
+      throw badRequest(`User ${userAliasToFollow} does not exist`);
+    }
 
-    return [followerCount, followeeCount];
+    // Only change the counts if this is a new follow (e.g. not a double click).
+    if (await this.followDAO.putFollow(currentAlias, userAliasToFollow)) {
+      await this.userDAO.incrementCounts(currentAlias, 0, 1);       // one more followee
+      await this.userDAO.incrementCounts(userAliasToFollow, 1, 0);  // one more follower
+    }
+
+    return this.getCountsOf(userAliasToFollow);
   };
 
   public async unfollow(

@@ -2,7 +2,8 @@
 import { DataPage } from "./DataPage";
 
 export interface FollowDAO {
-  putFollow(followerAlias: string, followeeAlias: string): Promise<void>;
+  // Returns false (and changes nothing) if the follow already existed.
+  putFollow(followerAlias: string, followeeAlias: string): Promise<boolean>;
 
   deleteFollow(followerAlias: string, followeeAlias: string): Promise<void>;
 

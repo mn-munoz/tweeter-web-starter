@@ -1,5 +1,6 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { GetCommand } from "@aws-sdk/lib-dynamodb";
+import { ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
+import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { DataPage } from "../DataPage";
 import { FollowDAO } from "../FollowDAO";
 import { DynamoBase } from "./DynamoBase";
@@ -15,8 +16,24 @@ export class DynamoFollowDAO extends DynamoBase implements FollowDAO {
     super("follow");
   }
 
-  public async putFollow(followerAlias: string, followeeAlias: string): Promise<void> {
-    throw new Error("putFollow is not implemented yet");
+  public async putFollow(followerAlias: string, followeeAlias: string): Promise<boolean> {
+    try {
+      await this.client.send(
+        new PutCommand({
+          TableName: this.tableName,
+          Item: { [this.followerAttr]: followerAlias, [this.followeeAttr]: followeeAlias },
+          // Fail instead of overwriting, so callers know whether it was new.
+          ConditionExpression: "attribute_not_exists(#follower)",
+          ExpressionAttributeNames: { "#follower": this.followerAttr },
+        }),
+      );
+      return true;
+    } catch (error) {
+      if (error instanceof ConditionalCheckFailedException) {
+        return false;
+      }
+      throw error;
+    }
   }
 
   public async deleteFollow(followerAlias: string, followeeAlias: string): Promise<void> {

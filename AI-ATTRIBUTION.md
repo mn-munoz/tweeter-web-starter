@@ -157,3 +157,8 @@
 - Tool: Claude Code
 - Task: Implement follower status: check the follow table for a (follower, followee) row with DynamoFollowDAO.isFollower and use it in FollowService.getIsFollowerStatus.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/dao/FollowDAO.ts, tweeter-server/src/model/dao/dynamo/DynamoFollowDAO.ts, tweeter-server/src/model/service/FollowService.ts, tweeter-server/src/lambda/follow/FollowUserLambda.ts
+- Tool: Claude Code
+- Task: Implement follow: the logged-in user (from the token) follows another user, the follow row is added only if new, both users' counts are updated, and the followed user's new counts are returned.
+- Review: DONE
