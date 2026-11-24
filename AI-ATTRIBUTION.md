@@ -172,3 +172,8 @@
 - Tool: Claude Code
 - Task: Implement the story list from DynamoDB: add the story table, a DynamoStatusDAO (reusable for the feed) with newest-first paging, a DAOFactory constructor for StatusService, and loadMoreStoryItems.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/service/AuthorizedService.ts (new file), tweeter-server/src/model/service/UserService.ts, tweeter-server/src/model/service/FollowService.ts, tweeter-server/src/model/service/StatusService.ts
+- Tool: Claude Code
+- Task: Move the AuthorizationService dependency out of the three services into a shared abstract AuthorizedService base class with a protected authorize method.
+- Review: TODO

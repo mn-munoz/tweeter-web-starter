@@ -6,27 +6,25 @@ import { DAOFactory } from "../dao/DAOFactory";
 import { ImageDAO } from "../dao/ImageDAO";
 import { UserDAO } from "../dao/UserDAO";
 import { AuthorizationService } from "./AuthorizationService";
-import { Service } from "./Service";
+import { AuthorizedService } from "./AuthorizedService";
 import { badRequest } from "./ServiceErrors";
 
 const SALT_ROUNDS = 10;
 
-export class UserService implements Service {
+export class UserService extends AuthorizedService {
   private readonly userDAO: UserDAO;
   private readonly authTokenDAO: AuthTokenDAO;
   private readonly imageDAO: ImageDAO;
-  private readonly authorizationService: AuthorizationService;
 
-  // authorizationService can be passed in (e.g. a mock in tests); by default
-  // it is built from the same factory.
+  // authorizationService is optional (see AuthorizedService).
   public constructor(
     daoFactory: DAOFactory,
-    authorizationService: AuthorizationService = new AuthorizationService(daoFactory),
+    authorizationService?: AuthorizationService,
   ) {
+    super(daoFactory, authorizationService);
     this.userDAO = daoFactory.getUserDAO();
     this.authTokenDAO = daoFactory.getAuthTokenDAO();
     this.imageDAO = daoFactory.getImageDAO();
-    this.authorizationService = authorizationService;
   }
 
   // Returns null if no user has the alias (the client then stays on the current page).
@@ -34,7 +32,7 @@ export class UserService implements Service {
     token: string,
     alias: string,
   ): Promise<UserDto | null> {
-    await this.authorizationService.authorize(token);
+    await this.authorize(token);
     return this.userDAO.getUser(this.normalizeAlias(alias ?? ""));
   }
 

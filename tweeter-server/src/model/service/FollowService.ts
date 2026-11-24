@@ -5,23 +5,21 @@ import { DataPage } from "../dao/DataPage";
 import { FollowDAO } from "../dao/FollowDAO";
 import { UserDAO } from "../dao/UserDAO";
 import { AuthorizationService } from "./AuthorizationService";
-import { Service } from "./Service";
+import { AuthorizedService } from "./AuthorizedService";
 import { badRequest } from "./ServiceErrors";
 
-export class FollowService implements Service {
+export class FollowService extends AuthorizedService {
   private readonly userDAO: UserDAO;
   private readonly followDAO: FollowDAO;
-  private readonly authorizationService: AuthorizationService;
 
-  // authorizationService can be passed in (e.g. a mock in tests); by default
-  // it is built from the same factory.
+  // authorizationService is optional (see AuthorizedService).
   public constructor(
     daoFactory: DAOFactory,
-    authorizationService: AuthorizationService = new AuthorizationService(daoFactory),
+    authorizationService?: AuthorizationService,
   ) {
+    super(daoFactory, authorizationService);
     this.userDAO = daoFactory.getUserDAO();
     this.followDAO = daoFactory.getFollowDAO();
-    this.authorizationService = authorizationService;
   }
 
   // Shared by the followees and followers lists: authorizes, loads a page of
@@ -33,14 +31,14 @@ export class FollowService implements Service {
     lastItem: UserDto | null,
     pageFunction: (alias: string, pageSize: number, lastAlias: string | null) => Promise<DataPage<string>>,
   ): Promise<[UserDto[], boolean]> {
-    await this.authorizationService.authorize(authToken);
+    await this.authorize(authToken);
     const page = await pageFunction(userAlias, pageSize, lastItem?.alias ?? null);
     const users = await this.userDAO.getUsers(page.items);
     return [users, page.hasMore];
   }
 
   private async getCount(authToken: string, userAlias: string, countFunction: (alias: string) => Promise<number>): Promise<number> {
-    await this.authorizationService.authorize(authToken);
+    await this.authorize(authToken);
     return countFunction(userAlias);
   }
 
@@ -79,7 +77,7 @@ export class FollowService implements Service {
     userAlias: string,
     selectedUserAlias: string,
   ): Promise<boolean> {
-    await this.authorizationService.authorize(authToken);
+    await this.authorize(authToken);
     return this.followDAO.isFollower(userAlias, selectedUserAlias);
   };
 
@@ -129,7 +127,7 @@ export class FollowService implements Service {
     delta: number,
     changeRow: (followerAlias: string, followeeAlias: string) => Promise<boolean>,
   ): Promise<[followerCount: number, followeeCount: number]> {
-    const currentAlias = await this.authorizationService.authorize(authToken);
+    const currentAlias = await this.authorize(authToken);
 
     if (currentAlias === targetAlias) {
       throw badRequest("You cannot follow or unfollow yourself");

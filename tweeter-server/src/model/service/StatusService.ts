@@ -4,22 +4,20 @@ import { DAOFactory } from "../dao/DAOFactory";
 import { StatusDAO } from "../dao/StatusDAO";
 import { UserDAO } from "../dao/UserDAO";
 import { AuthorizationService } from "./AuthorizationService";
-import { Service } from "./Service";
+import { AuthorizedService } from "./AuthorizedService";
 
-export class StatusService implements Service {
+export class StatusService extends AuthorizedService {
   private readonly userDAO: UserDAO;
   private readonly storyDAO: StatusDAO;
-  private readonly authorizationService: AuthorizationService;
 
-  // authorizationService can be passed in (e.g. a mock in tests); by default
-  // it is built from the same factory.
+  // authorizationService is optional (see AuthorizedService).
   public constructor(
     daoFactory: DAOFactory,
-    authorizationService: AuthorizationService = new AuthorizationService(daoFactory),
+    authorizationService?: AuthorizationService,
   ) {
+    super(daoFactory, authorizationService);
     this.userDAO = daoFactory.getUserDAO();
     this.storyDAO = daoFactory.getStoryDAO();
-    this.authorizationService = authorizationService;
   }
 
   private async getFakeData(lastItem: StatusDto | null, pageSize: number): Promise<[StatusDto[], boolean]> {
@@ -37,7 +35,7 @@ export class StatusService implements Service {
     lastItem: StatusDto | null,
     statusDAO: StatusDAO,
   ): Promise<[StatusDto[], boolean]> {
-    await this.authorizationService.authorize(authToken);
+    await this.authorize(authToken);
     const page = await statusDAO.getPage(userAlias, pageSize, lastItem?.timestamp ?? null);
 
     // One batch read for all authors on the page (a story has just one).
