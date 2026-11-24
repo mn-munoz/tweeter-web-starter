@@ -2,8 +2,9 @@
 import { FollowStatusRequest, FollowStatusResponse } from "tweeter-shared";
 import { DynamoDAOFactory } from "../../model/dao/dynamo/DynamoDAOFactory";
 import { FollowService } from "../../model/service/FollowService";
+import { withErrorMapping } from "../withErrorMapping";
 
-export const handler = async (request: FollowStatusRequest): Promise<FollowStatusResponse> => {
+export const handler = withErrorMapping(async (request: FollowStatusRequest): Promise<FollowStatusResponse> => {
     const followService = new FollowService(new DynamoDAOFactory());
     const isFollower = await followService.getIsFollowerStatus(request.token, request.userAlias, request.selectedUserAlias);
 
@@ -12,4 +13,4 @@ export const handler = async (request: FollowStatusRequest): Promise<FollowStatu
         message: null,
         isFollower: isFollower,
     }
-}
+});

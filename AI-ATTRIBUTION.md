@@ -152,3 +152,8 @@
 - Tool: Claude Code
 - Task: Refactor the duplicated followees and followers queries in DynamoFollowDAO into one shared private helper.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/dao/dynamo/DynamoFollowDAO.ts, tweeter-server/src/model/service/FollowService.ts, tweeter-server/src/lambda/follow/GetFollowerStatusLambda.ts
+- Tool: Claude Code
+- Task: Implement follower status: check the follow table for a (follower, followee) row with DynamoFollowDAO.isFollower and use it in FollowService.getIsFollowerStatus.
+- Review: DONE

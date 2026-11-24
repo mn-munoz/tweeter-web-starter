@@ -1,5 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { FakeData, UserDto } from "tweeter-shared";
+import { UserDto } from "tweeter-shared";
 import { DAOFactory } from "../dao/DAOFactory";
 import { DataPage } from "../dao/DataPage";
 import { FollowDAO } from "../dao/FollowDAO";
@@ -65,13 +65,14 @@ export class FollowService implements Service {
     );
   };
 
+  // Whether userAlias (the logged-in user) follows selectedUserAlias (the displayed user).
   public async getIsFollowerStatus(
     authToken: string,
     userAlias: string,
     selectedUserAlias: string,
   ): Promise<boolean> {
-    // TODO: Replace with the result of calling server
-    return FakeData.instance.isFollower();
+    await this.authorizationService.authorize(authToken);
+    return this.followDAO.isFollower(userAlias, selectedUserAlias);
   };
 
   // The count is stored on the user's item and kept up to date by follow/unfollow.

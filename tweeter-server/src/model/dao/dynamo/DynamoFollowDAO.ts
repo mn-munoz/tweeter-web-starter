@@ -1,4 +1,5 @@
 // AI-assisted: see AI-ATTRIBUTION.md
+import { GetCommand } from "@aws-sdk/lib-dynamodb";
 import { DataPage } from "../DataPage";
 import { FollowDAO } from "../FollowDAO";
 import { DynamoBase } from "./DynamoBase";
@@ -22,8 +23,15 @@ export class DynamoFollowDAO extends DynamoBase implements FollowDAO {
     throw new Error("deleteFollow is not implemented yet");
   }
 
+  // The table's key is (follower, followee), so this is a single key lookup.
   public async isFollower(followerAlias: string, followeeAlias: string): Promise<boolean> {
-    throw new Error("isFollower is not implemented yet");
+    const output = await this.client.send(
+      new GetCommand({
+        TableName: this.tableName,
+        Key: { [this.followerAttr]: followerAlias, [this.followeeAttr]: followeeAlias },
+      }),
+    );
+    return output.Item !== undefined;
   }
 
   // Queries the table itself: every row for this follower is a user they follow,
