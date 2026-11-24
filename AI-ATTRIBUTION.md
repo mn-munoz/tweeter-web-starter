@@ -207,3 +207,8 @@
 - Tool: Claude Code
 - Task: Implement the feed list by reading each user's precomputed feed from the feed table through the shared loadStatusPage helper, and remove the last FakeData use from the server.
 - Review: DONE
+
+## 2026-11-24: tweeter-web/test/network/ServerFacade.test.ts, tweeter-web/test/model.service/StatusService.test.ts, tweeter-web/test/network/integrationTestData.ts (new file)
+- Tool: Claude Code
+- Task: Fix the integration tests that broke after switching the server from FakeData to the real database, so they pass, and report any issues found in the code.
+- Review: DONE
