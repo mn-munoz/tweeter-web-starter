@@ -708,6 +708,26 @@ Resources:
         AttributeName: expires_at
         Enabled: true
 
+  # A user's own statuses, newest first by timestamp.
+  storyTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: story
+      AttributeDefinitions:
+        - AttributeName: author_alias
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: author_alias
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
   #
   # TODO: ADD MORE TABLE DEFINITIONS HERE
   #

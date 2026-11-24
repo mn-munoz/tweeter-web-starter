@@ -167,3 +167,8 @@
 - Tool: Claude Code
 - Task: Implement unfollow (delete the follow row only if it exists and decrement both users' counts), sharing one helper with follow in FollowService.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/dao/dynamo/DynamoStatusDAO.ts (new file), tweeter-server/src/model/dao/dynamo/DynamoDAOFactory.ts, tweeter-server/src/model/service/StatusService.ts, tweeter-server/src/lambda/status/GetStoryLambda.ts, tweeter-server/src/lambda/status/GetFeedLambda.ts, tweeter-server/src/lambda/status/PostStatusLambda.ts, tweeter-server/template.yaml
+- Tool: Claude Code
+- Task: Implement the story list from DynamoDB: add the story table, a DynamoStatusDAO (reusable for the feed) with newest-first paging, a DAOFactory constructor for StatusService, and loadMoreStoryItems.
+- Review: DONE

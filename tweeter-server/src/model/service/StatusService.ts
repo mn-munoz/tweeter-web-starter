@@ -1,12 +1,57 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { Status, FakeData, StatusDto } from "tweeter-shared";
+import { Status, FakeData, StatusDto, UserDto } from "tweeter-shared";
+import { DAOFactory } from "../dao/DAOFactory";
+import { StatusDAO } from "../dao/StatusDAO";
+import { UserDAO } from "../dao/UserDAO";
+import { AuthorizationService } from "./AuthorizationService";
 import { Service } from "./Service";
 
 export class StatusService implements Service {
+  private readonly userDAO: UserDAO;
+  private readonly storyDAO: StatusDAO;
+  private readonly authorizationService: AuthorizationService;
+
+  // authorizationService can be passed in (e.g. a mock in tests); by default
+  // it is built from the same factory.
+  public constructor(
+    daoFactory: DAOFactory,
+    authorizationService: AuthorizationService = new AuthorizationService(daoFactory),
+  ) {
+    this.userDAO = daoFactory.getUserDAO();
+    this.storyDAO = daoFactory.getStoryDAO();
+    this.authorizationService = authorizationService;
+  }
+
   private async getFakeData(lastItem: StatusDto | null, pageSize: number): Promise<[StatusDto[], boolean]> {
       const [items, hasMore] = FakeData.instance.getPageOfStatuses(Status.fromDto(lastItem), pageSize);
       const dtos = items.map((status) => status.dto);
       return [dtos, hasMore];
+  }
+
+  // Shared by the story and feed lists: authorizes, loads a page of stored
+  // statuses from statusDAO, then attaches each status's author.
+  private async loadStatusPage(
+    authToken: string,
+    userAlias: string,
+    pageSize: number,
+    lastItem: StatusDto | null,
+    statusDAO: StatusDAO,
+  ): Promise<[StatusDto[], boolean]> {
+    await this.authorizationService.authorize(authToken);
+    const page = await statusDAO.getPage(userAlias, pageSize, lastItem?.timestamp ?? null);
+
+    // One batch read for all authors on the page (a story has just one).
+    const authors = await this.userDAO.getUsers(page.items.map((status) => status.authorAlias));
+    const authorsByAlias = new Map<string, UserDto>(authors.map((user) => [user.alias, user]));
+
+    const statuses: StatusDto[] = [];
+    for (const stored of page.items) {
+      const author = authorsByAlias.get(stored.authorAlias);
+      if (author !== undefined) {
+        statuses.push({ post: stored.post, user: author, timestamp: stored.timestamp });
+      }
+    }
+    return [statuses, page.hasMore];
   }
 
   public async loadMoreFeedItems(
@@ -24,7 +69,7 @@ export class StatusService implements Service {
     pageSize: number,
     lastItem: StatusDto | null,
   ): Promise<[StatusDto[], boolean]> {
-    return this.getFakeData(lastItem, pageSize);
+    return this.loadStatusPage(authToken, userAlias, pageSize, lastItem, this.storyDAO);
   }
 
   public async postStatus(
