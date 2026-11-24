@@ -162,3 +162,8 @@
 - Tool: Claude Code
 - Task: Implement follow: the logged-in user (from the token) follows another user, the follow row is added only if new, both users' counts are updated, and the followed user's new counts are returned.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/dao/FollowDAO.ts, tweeter-server/src/model/dao/dynamo/DynamoFollowDAO.ts, tweeter-server/src/model/service/FollowService.ts, tweeter-server/src/lambda/follow/UnfollowUserLambda.ts
+- Tool: Claude Code
+- Task: Implement unfollow (delete the follow row only if it exists and decrement both users' counts), sharing one helper with follow in FollowService.
+- Review: DONE

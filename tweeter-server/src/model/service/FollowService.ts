@@ -104,34 +104,45 @@ export class FollowService implements Service {
     authToken: string,
     userAliasToFollow: string,
   ): Promise<[followerCount: number, followeeCount: number]>{
-    const currentAlias = await this.authorizationService.authorize(authToken);
-
-    if (currentAlias === userAliasToFollow) {
-      throw badRequest("You cannot follow yourself");
-    }
-    if ((await this.userDAO.getUser(userAliasToFollow)) === null) {
-      throw badRequest(`User ${userAliasToFollow} does not exist`);
-    }
-
-    // Only change the counts if this is a new follow (e.g. not a double click).
-    if (await this.followDAO.putFollow(currentAlias, userAliasToFollow)) {
-      await this.userDAO.incrementCounts(currentAlias, 0, 1);       // one more followee
-      await this.userDAO.incrementCounts(userAliasToFollow, 1, 0);  // one more follower
-    }
-
-    return this.getCountsOf(userAliasToFollow);
+    return this.changeFollow(authToken, userAliasToFollow, 1, (follower, followee) =>
+      this.followDAO.putFollow(follower, followee),
+    );
   };
 
+  // The logged-in user stops following userAliasToUnfollow.
+  // Returns the unfollowed user's new counts, which the client displays.
   public async unfollow(
     authToken: string,
     userAliasToUnfollow: string,
   ): Promise<[followerCount: number, followeeCount: number]>{
-
-    // TODO: Call the server
-
-    const followerCount = await this.getFollowerCount(authToken, userAliasToUnfollow);
-    const followeeCount = await this.getFolloweeCount(authToken, userAliasToUnfollow);
-
-    return [followerCount, followeeCount];
+    return this.changeFollow(authToken, userAliasToUnfollow, -1, (follower, followee) =>
+      this.followDAO.deleteFollow(follower, followee),
+    );
   };
+
+  // Shared by follow and unfollow. changeRow adds or deletes the follow row and
+  // returns whether anything changed; only then are both users' counts moved by
+  // delta (+1 or -1), so a double click can't count twice.
+  private async changeFollow(
+    authToken: string,
+    targetAlias: string,
+    delta: number,
+    changeRow: (followerAlias: string, followeeAlias: string) => Promise<boolean>,
+  ): Promise<[followerCount: number, followeeCount: number]> {
+    const currentAlias = await this.authorizationService.authorize(authToken);
+
+    if (currentAlias === targetAlias) {
+      throw badRequest("You cannot follow or unfollow yourself");
+    }
+    if ((await this.userDAO.getUser(targetAlias)) === null) {
+      throw badRequest(`User ${targetAlias} does not exist`);
+    }
+
+    if (await changeRow(currentAlias, targetAlias)) {
+      await this.userDAO.incrementCounts(currentAlias, 0, delta);  // current user's followees
+      await this.userDAO.incrementCounts(targetAlias, delta, 0);   // target user's followers
+    }
+
+    return this.getCountsOf(targetAlias);
+  }
 }

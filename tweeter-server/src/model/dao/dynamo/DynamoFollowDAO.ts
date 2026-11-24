@@ -1,6 +1,6 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { ConditionalCheckFailedException } from "@aws-sdk/client-dynamodb";
-import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { DataPage } from "../DataPage";
 import { FollowDAO } from "../FollowDAO";
 import { DynamoBase } from "./DynamoBase";
@@ -36,8 +36,24 @@ export class DynamoFollowDAO extends DynamoBase implements FollowDAO {
     }
   }
 
-  public async deleteFollow(followerAlias: string, followeeAlias: string): Promise<void> {
-    throw new Error("deleteFollow is not implemented yet");
+  public async deleteFollow(followerAlias: string, followeeAlias: string): Promise<boolean> {
+    try {
+      await this.client.send(
+        new DeleteCommand({
+          TableName: this.tableName,
+          Key: { [this.followerAttr]: followerAlias, [this.followeeAttr]: followeeAlias },
+          // Fail instead of silently deleting nothing, so callers know whether it existed.
+          ConditionExpression: "attribute_exists(#follower)",
+          ExpressionAttributeNames: { "#follower": this.followerAttr },
+        }),
+      );
+      return true;
+    } catch (error) {
+      if (error instanceof ConditionalCheckFailedException) {
+        return false;
+      }
+      throw error;
+    }
   }
 
   // The table's key is (follower, followee), so this is a single key lookup.

@@ -5,7 +5,8 @@ export interface FollowDAO {
   // Returns false (and changes nothing) if the follow already existed.
   putFollow(followerAlias: string, followeeAlias: string): Promise<boolean>;
 
-  deleteFollow(followerAlias: string, followeeAlias: string): Promise<void>;
+  // Returns false (and changes nothing) if there was no such follow.
+  deleteFollow(followerAlias: string, followeeAlias: string): Promise<boolean>;
 
   isFollower(followerAlias: string, followeeAlias: string): Promise<boolean>;
 
