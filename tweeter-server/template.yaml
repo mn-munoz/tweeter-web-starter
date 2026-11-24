@@ -728,6 +728,27 @@ Resources:
         ReadCapacityUnits: 1
         WriteCapacityUnits: 1
 
+  # Each user's precomputed feed, newest first by timestamp. A row is written for
+  # every follower when a status is posted; author_alias and post are also stored.
+  feedTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: feed
+      AttributeDefinitions:
+        - AttributeName: owner_alias
+          AttributeType: S
+        - AttributeName: timestamp
+          AttributeType: N
+      KeySchema:
+        - AttributeName: owner_alias
+          KeyType: HASH
+        - AttributeName: timestamp
+          KeyType: RANGE
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
   #
   # TODO: ADD MORE TABLE DEFINITIONS HERE
   #

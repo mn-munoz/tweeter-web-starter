@@ -182,3 +182,8 @@
 - Tool: Claude Code
 - Task: Implement posting a status to the author's story: authorize, check the author is the logged-in user and the post is valid, and store it with DynamoStatusDAO.put. Feed fan-out is left for the next step.
 - Review: DONE
+
+## 2026-11-24: tweeter-server/template.yaml
+- Tool: Claude Code
+- Task: Add the feed DynamoDB table (partition key owner_alias, sort key timestamp) to template.yaml.
+- Review: DONE
