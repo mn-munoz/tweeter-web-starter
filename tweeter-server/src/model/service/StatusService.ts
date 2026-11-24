@@ -1,6 +1,7 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { Status, FakeData, StatusDto, UserDto } from "tweeter-shared";
 import { DAOFactory } from "../dao/DAOFactory";
+import { FollowDAO } from "../dao/FollowDAO";
 import { StatusDAO, StoredStatus } from "../dao/StatusDAO";
 import { UserDAO } from "../dao/UserDAO";
 import { AuthorizationService } from "./AuthorizationService";
@@ -10,6 +11,8 @@ import { badRequest, unauthorized } from "./ServiceErrors";
 export class StatusService extends AuthorizedService {
   private readonly userDAO: UserDAO;
   private readonly storyDAO: StatusDAO;
+  private readonly feedDAO: StatusDAO;
+  private readonly followDAO: FollowDAO;
 
   // authorizationService is optional (see AuthorizedService).
   public constructor(
@@ -19,6 +22,8 @@ export class StatusService extends AuthorizedService {
     super(daoFactory, authorizationService);
     this.userDAO = daoFactory.getUserDAO();
     this.storyDAO = daoFactory.getStoryDAO();
+    this.feedDAO = daoFactory.getFeedDAO();
+    this.followDAO = daoFactory.getFollowDAO();
   }
 
   private async getFakeData(lastItem: StatusDto | null, pageSize: number): Promise<[StatusDto[], boolean]> {
@@ -94,7 +99,16 @@ export class StatusService extends AuthorizedService {
       timestamp: newStatus.timestamp,
     };
     await this.storyDAO.put(currentAlias, stored);
+    await this.fanOutToFeeds(currentAlias, stored);
+  }
 
-    // TODO: Add the status to each follower's feed (next step, with the feed table).
+  // Precomputes feeds: writes the new status into the feed of every user who
+  // follows the author, so reading a feed is a single query. Kept separate so
+  // Part B can move it to a queue without changing postStatus.
+  private async fanOutToFeeds(authorAlias: string, status: StoredStatus): Promise<void> {
+    const followers = await this.followDAO.getAllFollowers(authorAlias);
+    if (followers.length > 0) {
+      await this.feedDAO.batchPut(followers, status);
+    }
   }
 }

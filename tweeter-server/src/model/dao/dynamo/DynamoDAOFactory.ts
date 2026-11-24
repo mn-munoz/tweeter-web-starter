@@ -30,7 +30,7 @@ export class DynamoDAOFactory implements DAOFactory {
   }
 
   public getFeedDAO(): StatusDAO {
-    throw new Error("Feed DAO is not implemented yet");
+    return new DynamoStatusDAO("feed", "owner_alias");
   }
 
   public getImageDAO(): ImageDAO {

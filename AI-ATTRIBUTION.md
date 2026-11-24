@@ -197,3 +197,8 @@
 - Tool: Claude Code
 - Task: Add a batch-write helper to DynamoBase (chunks of 25, retrying unprocessed items with backoff) and use it to implement DynamoStatusDAO.batchPut.
 - Review: DONE
+
+## 2026-11-24: tweeter-server/src/model/service/StatusService.ts, tweeter-server/src/model/dao/dynamo/DynamoDAOFactory.ts
+- Tool: Claude Code
+- Task: Implement the feed fan-out in postStatus: after saving to the story, get all of the author's followers and batch-write the status into each follower's feed; make DAOFactory return the real feed DAO.
+- Review: DONE
