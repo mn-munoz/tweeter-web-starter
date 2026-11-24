@@ -147,3 +147,8 @@
 - Tool: Claude Code
 - Task: Implement the followers list from DynamoDB by querying follow_index, sharing one paging helper between the followees and followers lists in FollowService.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/dao/dynamo/DynamoFollowDAO.ts
+- Tool: Claude Code
+- Task: Refactor the duplicated followees and followers queries in DynamoFollowDAO into one shared private helper.
+- Review: DONE

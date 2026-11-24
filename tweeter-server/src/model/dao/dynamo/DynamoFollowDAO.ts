@@ -33,20 +33,13 @@ export class DynamoFollowDAO extends DynamoBase implements FollowDAO {
     pageSize: number,
     lastFolloweeAlias: string | null,
   ): Promise<DataPage<string>> {
-    const startKey =
-      lastFolloweeAlias === null
-        ? undefined
-        : { [this.followerAttr]: followerAlias, [this.followeeAttr]: lastFolloweeAlias };
-
-    return this.queryPage(
-      {
-        KeyConditionExpression: "#follower = :follower",
-        ExpressionAttributeNames: { "#follower": this.followerAttr },
-        ExpressionAttributeValues: { ":follower": followerAlias },
-      },
+    return this.getPageOfAliases(
+      this.followerAttr,
+      this.followeeAttr,
+      undefined,
+      followerAlias,
       pageSize,
-      startKey,
-      (item) => item[this.followeeAttr] as string,
+      lastFolloweeAlias,
     );
   }
 
@@ -57,23 +50,41 @@ export class DynamoFollowDAO extends DynamoBase implements FollowDAO {
     pageSize: number,
     lastFollowerAlias: string | null,
   ): Promise<DataPage<string>> {
-    // A GSI's start key needs both the index key and the table key; here they
-    // are the same two attributes.
+    return this.getPageOfAliases(
+      this.followeeAttr,
+      this.followerAttr,
+      this.followIndex,
+      followeeAlias,
+      pageSize,
+      lastFollowerAlias,
+    );
+  }
+
+  // Shared by both lists. Finds the rows whose keyAttr equals alias (in the table,
+  // or in indexName if given) and returns each row's resultAttr.
+  private async getPageOfAliases(
+    keyAttr: string,
+    resultAttr: string,
+    indexName: string | undefined,
+    alias: string,
+    pageSize: number,
+    lastResultAlias: string | null,
+  ): Promise<DataPage<string>> {
+    // The start key is the last row's full key: both attributes. (For the GSI that
+    // covers both the index key and the table key, since they are the same two.)
     const startKey =
-      lastFollowerAlias === null
-        ? undefined
-        : { [this.followeeAttr]: followeeAlias, [this.followerAttr]: lastFollowerAlias };
+      lastResultAlias === null ? undefined : { [keyAttr]: alias, [resultAttr]: lastResultAlias };
 
     return this.queryPage(
       {
-        IndexName: this.followIndex,
-        KeyConditionExpression: "#followee = :followee",
-        ExpressionAttributeNames: { "#followee": this.followeeAttr },
-        ExpressionAttributeValues: { ":followee": followeeAlias },
+        IndexName: indexName,
+        KeyConditionExpression: "#key = :alias",
+        ExpressionAttributeNames: { "#key": keyAttr },
+        ExpressionAttributeValues: { ":alias": alias },
       },
       pageSize,
       startKey,
-      (item) => item[this.followerAttr] as string,
+      (item) => item[resultAttr] as string,
     );
   }
 
