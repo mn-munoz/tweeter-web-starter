@@ -1,6 +1,7 @@
 // AI-assisted: see AI-ATTRIBUTION.md
-import { User, FakeData, UserDto } from "tweeter-shared";
+import { FakeData, UserDto } from "tweeter-shared";
 import { DAOFactory } from "../dao/DAOFactory";
+import { DataPage } from "../dao/DataPage";
 import { FollowDAO } from "../dao/FollowDAO";
 import { UserDAO } from "../dao/UserDAO";
 import { AuthorizationService } from "./AuthorizationService";
@@ -22,10 +23,19 @@ export class FollowService implements Service {
     this.authorizationService = authorizationService;
   }
 
-  private async getFakeData(lastItem: UserDto | null, pageSize: number, userAlias: string): Promise<[UserDto[], boolean]> {
-    const [items, hasMore] = FakeData.instance.getPageOfUsers(User.fromDto(lastItem), pageSize, userAlias);
-    const dtos = items.map((user) => user.dto);
-    return [dtos, hasMore];
+  // Shared by the followees and followers lists: authorizes, loads a page of
+  // aliases with pageFunction, then loads those users (in the same order).
+  private async loadUserPage(
+    authToken: string,
+    userAlias: string,
+    pageSize: number,
+    lastItem: UserDto | null,
+    pageFunction: (alias: string, pageSize: number, lastAlias: string | null) => Promise<DataPage<string>>,
+  ): Promise<[UserDto[], boolean]> {
+    await this.authorizationService.authorize(authToken);
+    const page = await pageFunction(userAlias, pageSize, lastItem?.alias ?? null);
+    const users = await this.userDAO.getUsers(page.items);
+    return [users, page.hasMore];
   }
 
   private async getCount(authToken: string, userAlias: string, countFunction: (alias: string) => Promise<number>): Promise<number> {
@@ -39,10 +49,9 @@ export class FollowService implements Service {
     pageSize: number,
     lastItem: UserDto | null,
   ): Promise<[UserDto[], boolean]>{
-    await this.authorizationService.authorize(authToken);
-    const page = await this.followDAO.getPageOfFollowees(userAlias, pageSize, lastItem?.alias ?? null);
-    const users = await this.userDAO.getUsers(page.items);
-    return [users, page.hasMore];
+    return this.loadUserPage(authToken, userAlias, pageSize, lastItem, (alias, size, lastAlias) =>
+      this.followDAO.getPageOfFollowees(alias, size, lastAlias),
+    );
   };
 
   public async loadMoreFollowers(
@@ -51,8 +60,9 @@ export class FollowService implements Service {
     pageSize: number,
     lastItem: UserDto | null,
   ): Promise<[UserDto[], boolean]>{
-    // TODO: Replace with the result of calling server
-    return this.getFakeData(lastItem, pageSize, userAlias);
+    return this.loadUserPage(authToken, userAlias, pageSize, lastItem, (alias, size, lastAlias) =>
+      this.followDAO.getPageOfFollowers(alias, size, lastAlias),
+    );
   };
 
   public async getIsFollowerStatus(

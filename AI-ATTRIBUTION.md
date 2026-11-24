@@ -142,3 +142,8 @@
 - Tool: Claude Code
 - Task: Implement the followees list from DynamoDB: a generic paged-query helper in DynamoBase, DynamoFollowDAO.getPageOfFollowees, and FollowService.loadMoreFollowees; make UserDAO.getUsers return users in the requested order.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/dao/dynamo/DynamoFollowDAO.ts, tweeter-server/src/model/service/FollowService.ts, tweeter-server/src/lambda/follow/GetFollowersLambda.ts
+- Tool: Claude Code
+- Task: Implement the followers list from DynamoDB by querying follow_index, sharing one paging helper between the followees and followers lists in FollowService.
+- Review: DONE

@@ -8,6 +8,7 @@ import { DynamoBase } from "./DynamoBase";
 export class DynamoFollowDAO extends DynamoBase implements FollowDAO {
   private readonly followerAttr = "follower_handle";
   private readonly followeeAttr = "followee_handle";
+  private readonly followIndex = "follow_index";
 
   public constructor() {
     super("follow");
@@ -49,12 +50,31 @@ export class DynamoFollowDAO extends DynamoBase implements FollowDAO {
     );
   }
 
+  // Queries follow_index, where rows are grouped by followee: every row for this
+  // followee is one of their followers, sorted by follower alias.
   public async getPageOfFollowers(
     followeeAlias: string,
     pageSize: number,
     lastFollowerAlias: string | null,
   ): Promise<DataPage<string>> {
-    throw new Error("getPageOfFollowers is not implemented yet");
+    // A GSI's start key needs both the index key and the table key; here they
+    // are the same two attributes.
+    const startKey =
+      lastFollowerAlias === null
+        ? undefined
+        : { [this.followeeAttr]: followeeAlias, [this.followerAttr]: lastFollowerAlias };
+
+    return this.queryPage(
+      {
+        IndexName: this.followIndex,
+        KeyConditionExpression: "#followee = :followee",
+        ExpressionAttributeNames: { "#followee": this.followeeAttr },
+        ExpressionAttributeValues: { ":followee": followeeAlias },
+      },
+      pageSize,
+      startKey,
+      (item) => item[this.followerAttr] as string,
+    );
   }
 
   public async getAllFollowers(followeeAlias: string): Promise<string[]> {
