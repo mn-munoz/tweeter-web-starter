@@ -28,7 +28,7 @@ export class DynamoUserDAO extends DynamoBase implements UserDAO {
 
   public async getUsers(aliases: string[]): Promise<UserDto[]> {
     const unique = [...new Set(aliases)];
-    const users: UserDto[] = [];
+    const usersByAlias = new Map<string, UserDto>();
 
     for (let i = 0; i < unique.length; i += BATCH_GET_LIMIT) {
       let keys: Record<string, any>[] | undefined = unique
@@ -41,12 +41,18 @@ export class DynamoUserDAO extends DynamoBase implements UserDAO {
           new BatchGetCommand({ RequestItems: { [this.tableName]: { Keys: keys } } }),
         );
         const items = output.Responses?.[this.tableName] ?? [];
-        users.push(...items.map((item) => this.toUserDto(item)));
+        for (const item of items) {
+          const user = this.toUserDto(item);
+          usersByAlias.set(user.alias, user);
+        }
         keys = output.UnprocessedKeys?.[this.tableName]?.Keys;
       }
     }
 
-    return users;
+    // BatchGetItem returns items in no particular order, so restore the caller's.
+    return aliases
+      .map((alias) => usersByAlias.get(alias))
+      .filter((user): user is UserDto => user !== undefined);
   }
 
   public async getPasswordHash(alias: string): Promise<string | null> {

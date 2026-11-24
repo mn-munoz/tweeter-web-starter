@@ -7,6 +7,7 @@ import { S3ImageDAO } from "../s3/S3ImageDAO";
 import { StatusDAO } from "../StatusDAO";
 import { UserDAO } from "../UserDAO";
 import { DynamoAuthTokenDAO } from "./DynamoAuthTokenDAO";
+import { DynamoFollowDAO } from "./DynamoFollowDAO";
 import { DynamoUserDAO } from "./DynamoUserDAO";
 
 // Concrete factory: DynamoDB for tables, S3 for images.
@@ -20,7 +21,7 @@ export class DynamoDAOFactory implements DAOFactory {
   }
 
   public getFollowDAO(): FollowDAO {
-    throw new Error("FollowDAO is not implemented yet");
+    return new DynamoFollowDAO();
   }
 
   public getStoryDAO(): StatusDAO {

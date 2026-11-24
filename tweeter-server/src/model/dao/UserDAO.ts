@@ -4,7 +4,8 @@ import { UserDto } from "tweeter-shared";
 export interface UserDAO {
   getUser(alias: string): Promise<UserDto | null>;
 
-  // Returns the users that exist for the given aliases (in any order).
+  // Returns the users that exist for the given aliases, in the same order as
+  // the aliases. Aliases with no user are skipped.
   getUsers(aliases: string[]): Promise<UserDto[]>;
 
   getPasswordHash(alias: string): Promise<string | null>;

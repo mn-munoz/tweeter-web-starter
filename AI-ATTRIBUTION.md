@@ -137,3 +137,8 @@
 - Tool: Claude Code
 - Task: Implement getFolloweeCount: authorize the token and read the stored followee count from the user table. Give FollowService a DAOFactory constructor and pass the factory in from every follow lambda.
 - Review: DONE
+
+## 2026-11-23: tweeter-server/src/model/dao/dynamo/DynamoFollowDAO.ts (new file), tweeter-server/src/model/dao/dynamo/DynamoBase.ts, tweeter-server/src/model/dao/dynamo/DynamoDAOFactory.ts, tweeter-server/src/model/dao/dynamo/DynamoUserDAO.ts, tweeter-server/src/model/dao/UserDAO.ts, tweeter-server/src/model/service/FollowService.ts, tweeter-server/src/lambda/follow/GetFolloweesLambda.ts
+- Tool: Claude Code
+- Task: Implement the followees list from DynamoDB: a generic paged-query helper in DynamoBase, DynamoFollowDAO.getPageOfFollowees, and FollowService.loadMoreFollowees; make UserDAO.getUsers return users in the requested order.
+- Review: DONE

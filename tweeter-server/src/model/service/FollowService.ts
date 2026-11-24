@@ -1,12 +1,14 @@
 // AI-assisted: see AI-ATTRIBUTION.md
 import { User, FakeData, UserDto } from "tweeter-shared";
 import { DAOFactory } from "../dao/DAOFactory";
+import { FollowDAO } from "../dao/FollowDAO";
 import { UserDAO } from "../dao/UserDAO";
 import { AuthorizationService } from "./AuthorizationService";
 import { Service } from "./Service";
 
 export class FollowService implements Service {
   private readonly userDAO: UserDAO;
+  private readonly followDAO: FollowDAO;
   private readonly authorizationService: AuthorizationService;
 
   // authorizationService can be passed in (e.g. a mock in tests); by default
@@ -16,6 +18,7 @@ export class FollowService implements Service {
     authorizationService: AuthorizationService = new AuthorizationService(daoFactory),
   ) {
     this.userDAO = daoFactory.getUserDAO();
+    this.followDAO = daoFactory.getFollowDAO();
     this.authorizationService = authorizationService;
   }
 
@@ -36,8 +39,10 @@ export class FollowService implements Service {
     pageSize: number,
     lastItem: UserDto | null,
   ): Promise<[UserDto[], boolean]>{
-    // TODO: Replace with the result of calling server
-    return this.getFakeData(lastItem, pageSize, userAlias);
+    await this.authorizationService.authorize(authToken);
+    const page = await this.followDAO.getPageOfFollowees(userAlias, pageSize, lastItem?.alias ?? null);
+    const users = await this.userDAO.getUsers(page.items);
+    return [users, page.hasMore];
   };
 
   public async loadMoreFollowers(
